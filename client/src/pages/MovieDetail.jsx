@@ -346,9 +346,9 @@ export default function MovieDetail() {
                         <div className="mb-10 rounded-xl bg-zinc-900 border border-zinc-800 p-5 space-y-4">
                             <h3 className="text-sm font-semibold text-zinc-300 tracking-wide uppercase">Write a Review</h3>
                             <form onSubmit={handleReviewSubmit} className="space-y-4">
-                                <div className="flex items-center gap-3">
-                                    <label className="text-xs text-zinc-500 uppercase tracking-widest w-16 shrink-0">Rating</label>
-                                    <div className="flex gap-1">
+                                <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                                    <label className="text-xs text-zinc-500 uppercase tracking-widest shrink-0">Rating</label>
+                                    <div className="flex gap-1 flex-wrap">
                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                                             <button
                                                 key={n}
