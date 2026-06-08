@@ -486,11 +486,6 @@ export default function LandingPage() {
                         </span>
                     </div>
                     <span className="text-zinc-600 text-xs">© 2026 CineReview · Built by Vishwajeet</span>
-                    <div className="flex gap-6">
-                        {['Privacy', 'Terms', 'GitHub'].map((link) => (
-                            <a key={link} href="#" className="text-zinc-600 hover:text-zinc-400 text-xs transition-colors">{link}</a>
-                        ))}
-                    </div>
                 </footer>
 
             </div>
