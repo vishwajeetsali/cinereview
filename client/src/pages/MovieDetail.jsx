@@ -221,14 +221,15 @@ export default function MovieDetail() {
                                 <img src={posterUrl} alt={movie.title} className="w-full h-auto object-cover" />
                             </div>
                         </div>
+
                         <div className="flex flex-col justify-end gap-3 text-center sm:text-left items-center sm:items-start">
-                            <h1 className="font-serif text-5xl sm:text-5xl text-white leading-tight">
+                            <h1 className="font-serif text-4xl sm:text-5xl text-white leading-tight">
                                 {movie.title}
                             </h1>
 
                             {isLoggedIn && (
-                                <div className="relative group w-fit">
-                                    <button onClick={handleWatchlist} className={`w-fit flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition ${inWatchlist ? 'border-rose-500 text-rose-400 bg-rose-500/10' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'}`}>
+                                <div className="relative group w-fit mx-auto sm:mx-0">
+                                    <button onClick={handleWatchlist} className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition ${inWatchlist ? 'border-rose-500 text-rose-400 bg-rose-500/10' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'}`}>
                                         {inWatchlist ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                                         {inWatchlist ? 'Saved' : 'Watchlist'}
                                     </button>
@@ -285,7 +286,7 @@ export default function MovieDetail() {
                     </div>
 
                     {credits.length > 0 && (
-                        <div className="mt-4">
+                        <div className="mt-6">
                             <h3 className="text-xs text-zinc-500 uppercase tracking-widest mb-2">Cast</h3>
                             <div className="flex gap-2 flex-wrap">
                                 {credits.map(person => (
@@ -409,7 +410,7 @@ export default function MovieDetail() {
                                     key={review._id || review.id || index}
                                     className="rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors p-5 space-y-3"
                                 >
-                                    <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-start justify-between gap-2 flex-wrap">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300 shrink-0 overflow-hidden">
                                                 {review.userId?.avatar
@@ -422,7 +423,7 @@ export default function MovieDetail() {
                                             </Link>
                                         </div>
 
-                                        <div className="flex items-center gap-2 shrink-0">
+                                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
                                             {review.sentiment && (
                                                 <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${sentimentBadgeBg(review.sentiment)}`}>
                                                     {review.sentiment}
