@@ -98,7 +98,7 @@ export default function Home() {
 
                     {/* Content */}
                     <div className="relative z-10">
-                        <h1 className="font-serif text-5xl sm:text-6xl mb-3 leading-tight">
+                        <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl mb-3 leading-tight">
                             Discover Movies You'll Love
                         </h1>
                         <p className="text-zinc-400 text-lg mb-8">Search, review and explore cinema with your community.</p>
