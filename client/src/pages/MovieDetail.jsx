@@ -228,7 +228,7 @@ export default function MovieDetail() {
                             </h1>
 
                             {isLoggedIn && (
-                                <div className="relative group w-fit">
+                                <div className="relative group w-fit mx-auto sm:mx-0">
                                     <button onClick={handleWatchlist} className={`w-fit flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition ${inWatchlist ? 'border-rose-500 text-rose-400 bg-rose-500/10' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'}`}>
                                         {inWatchlist ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                                         {inWatchlist ? 'Saved' : 'Watchlist'}
