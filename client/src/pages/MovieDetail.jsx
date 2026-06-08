@@ -221,14 +221,13 @@ export default function MovieDetail() {
                                 <img src={posterUrl} alt={movie.title} className="w-full h-auto object-cover" />
                             </div>
                         </div>
-
-                        <div className="flex flex-col justify-end gap-3 text-center sm:text-left">
+                        <div className="flex flex-col justify-end gap-3 text-center sm:text-left items-center sm:items-start">
                             <h1 className="font-serif text-5xl sm:text-5xl text-white leading-tight">
                                 {movie.title}
                             </h1>
 
                             {isLoggedIn && (
-                                <div className="relative group w-fit mx-auto sm:mx-0">
+                                <div className="relative group w-fit">
                                     <button onClick={handleWatchlist} className={`w-fit flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg border transition ${inWatchlist ? 'border-rose-500 text-rose-400 bg-rose-500/10' : 'border-zinc-700 text-zinc-400 hover:border-zinc-500'}`}>
                                         {inWatchlist ? <BookmarkCheck size={14} /> : <Bookmark size={14} />}
                                         {inWatchlist ? 'Saved' : 'Watchlist'}
