@@ -17,6 +17,7 @@ import { Server } from 'socket.io';
 import { initSocket } from './sockets/reviewSocket.js';
 import { setIO } from './controllers/reviewController.js';
 import { setIO as setCommentIO } from './controllers/commentController.js';
+import { Request, Response, NextFunction } from 'express';
 
 connectDB();
 
@@ -70,16 +71,16 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/verdict', verdictRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: Response) => {
     res.send('Server is running');
 });
 
 // Global error handler
-app.use((err, req, res, next) => {
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     console.error(err.stack);
     res.status(500).json({ message: 'Internal server error' });
 });
 
-httpServer.listen(process.env.PORT || 5000, () => {
+httpServer.listen(Number(process.env.PORT) || 5000, () => {
     console.log(`Server running on ${process.env.PORT || 5000}`);
 });
