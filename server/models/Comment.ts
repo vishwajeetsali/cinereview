@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IComment } from '../types/index.js';
 
-const commentSchema = new mongoose.Schema({
+const commentSchema = new mongoose.Schema<IComment>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -21,6 +22,6 @@ const commentSchema = new mongoose.Schema({
     }
 })
 
-const Comment = mongoose.model("Comment", commentSchema);
+const Comment = mongoose.model<IComment>("Comment", commentSchema);
 
 export default Comment

@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
+import { IReview } from '../types/index.js';
 
-const reviewSchema = new mongoose.Schema({
+const reviewSchema = new mongoose.Schema<IReview>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -45,6 +46,6 @@ const reviewSchema = new mongoose.Schema({
     }
 })
 
-const Review = mongoose.model("Review", reviewSchema);
+const Review = mongoose.model<IReview>("Review", reviewSchema);
 
 export default Review

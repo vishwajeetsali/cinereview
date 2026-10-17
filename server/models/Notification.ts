@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-
-const notificationSchema = new mongoose.Schema({
+import { INotification } from '../types/index.js';
+const notificationSchema = new mongoose.Schema<INotification>({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -31,6 +31,6 @@ const notificationSchema = new mongoose.Schema({
     }
 })
 
-const Notification = mongoose.model("Notification", notificationSchema);
+const Notification = mongoose.model<INotification>("Notification", notificationSchema);
 
 export default Notification

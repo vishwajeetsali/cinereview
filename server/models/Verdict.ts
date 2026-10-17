@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-
-const verdictSchema = new mongoose.Schema({
+import { IVerdict } from '../types/index.js';
+const verdictSchema = new mongoose.Schema<IVerdict>({
     tmdbId: {
         type: Number,
         required: true,
@@ -25,6 +25,6 @@ const verdictSchema = new mongoose.Schema({
     }
 })
 
-const Verdict = mongoose.model('Verdict', verdictSchema);
+const Verdict = mongoose.model<IVerdict>('Verdict', verdictSchema);
 
 export default Verdict
