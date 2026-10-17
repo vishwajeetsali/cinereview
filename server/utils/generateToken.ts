@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
+import { Role } from '../types/index.js';
 
-type Role = "user" | "mod" | "admin";
 
 export const generateAccessToken = (userId: string, name: string, role: Role): string => {
     return jwt.sign(
