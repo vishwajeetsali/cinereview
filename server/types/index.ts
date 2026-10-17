@@ -84,3 +84,16 @@ export interface IVerdict {
     lastUpdated?: Date;
 }
 
+export interface AuthUser {
+    userId?: string;
+    _id?: any;
+    name?: string;
+    role?: Role;
+    [key: string]: any;
+}
+
+declare global {
+    namespace Express {
+        interface User extends AuthUser { }
+    }
+}

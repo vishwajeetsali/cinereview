@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
+import { Request, Response, NextFunction } from "express";
 
 const redis = Redis.fromEnv();
 
@@ -8,9 +9,10 @@ const rateLimit = new Ratelimit({
     limiter: Ratelimit.slidingWindow(5, "1 m"),
 });
 
-export const rateLimitMiddleware = async (req, res, next) => {
+export const rateLimitMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const { success } = await rateLimit.limit(req.user.userId);
+        const identifier = req.user?.userId || "anonymous";
+        const { success } = await rateLimit.limit(identifier);
 
         if (!success) {
             return res.status(429).json({ message: "Too many requests" });

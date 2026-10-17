@@ -1,7 +1,11 @@
 import User from '../models/User.js'
+import { Request, Response, NextFunction } from 'express'
+import { Role } from '../types/index.js'
 
-const requireRole = (...roles) => {
-    return async (req, res, next) => {
+const requireRole = (...roles: Role[]) => {
+    return async (req: Request, res: Response, next: NextFunction
+
+    ) => {
         if (!req.user) {
             return res.status(401).json({ message: 'Unauthorized' })
         }

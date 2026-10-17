@@ -22,3 +22,5 @@ declare namespace NodeJS {
         MAIL_FROM: string;
     }
 }
+
+declare module 'multer-storage-cloudinary';
