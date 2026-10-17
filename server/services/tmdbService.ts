@@ -9,7 +9,9 @@ const tmdbAxios = axios.create({
     headers: { 'User-Agent': 'Mozilla/5.0' }
 });
 
-export const searchMovies = async (query, page = 1) => {
+type ID = number | string;
+
+export const searchMovies = async (query: string, page = 1) => {
     try {
         const cacheKey = `tmdb:search:${query}:${page}`;
         const cached = await redis.get(cacheKey);
@@ -26,7 +28,7 @@ export const searchMovies = async (query, page = 1) => {
     }
 };
 
-export const getMovieDetails = async (tmdbId, retries = 3) => {
+export const getMovieDetails = async (tmdbId: ID, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:movie:${tmdbId}`);
         if (cached) return cached;
@@ -86,7 +88,7 @@ export const getNowPlayingMovies = async (page = 1, retries = 3) => {
     }
 };
 
-export const getMoviesByGenre = async (genreId, page, sort_by, retries = 3) => {
+export const getMoviesByGenre = async (genreId: ID, page: number, sort_by: string, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:genre:${genreId}:${page}:${sort_by}`);
         if (cached) return cached;
@@ -126,7 +128,7 @@ export const getTrendingMovies = async (page = 1, retries = 3) => {
     }
 };
 
-export const getMovieCredits = async (tmdbId, retries = 3) => {
+export const getMovieCredits = async (tmdbId: ID, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:credits:${tmdbId}`);
         if (cached) return cached;
@@ -146,7 +148,7 @@ export const getMovieCredits = async (tmdbId, retries = 3) => {
     }
 };
 
-export const getSimilarMovies = async (tmdbId, retries = 3) => {
+export const getSimilarMovies = async (tmdbId: ID, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:similar:${tmdbId}`);
         if (cached) return cached;
@@ -166,7 +168,7 @@ export const getSimilarMovies = async (tmdbId, retries = 3) => {
     }
 };
 
-export const getPersonDetails = async (personId, retries = 3) => {
+export const getPersonDetails = async (personId: ID, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:person:${personId}`);
         if (cached) return cached;
@@ -186,7 +188,7 @@ export const getPersonDetails = async (personId, retries = 3) => {
     }
 };
 
-export const getPersonCredits = async (personId, retries = 3) => {
+export const getPersonCredits = async (personId: ID, retries = 3) => {
     try {
         const cached = await redis.get(`tmdb:person:${personId}:credits`);
         if (cached) return cached;

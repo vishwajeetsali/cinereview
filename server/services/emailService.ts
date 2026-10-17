@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST,
-    port: process.env.MAIL_PORT,
+    port: Number(process.env.MAIL_PORT),
     secure: false,
     auth: {
         user: process.env.MAIL_USER,
@@ -10,7 +10,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendFollowNotification = async (toEmail, toName, followerName) => {
+export const sendFollowNotification = async (toEmail: string, toName: string, followerName: string): Promise<void> => {
     try {
         await transporter.sendMail({
             from: process.env.MAIL_FROM,
@@ -37,7 +37,7 @@ export const sendFollowNotification = async (toEmail, toName, followerName) => {
     }
 };
 
-export const sendVerdictNotification = async (toEmail, toName, movieTitle) => {
+export const sendVerdictNotification = async (toEmail: string, toName: string, movieTitle: string): Promise<void> => {
     try {
         await transporter.sendMail({
             from: process.env.MAIL_FROM,

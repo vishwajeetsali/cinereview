@@ -1,8 +1,14 @@
-import Groq from 'groq-sdk'
+import Groq from 'groq-sdk';
+import { Sentiment } from '../types/index.js';
+
+export interface SentimentResult {
+    sentiment: Sentiment;
+    score: number;
+}
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
 
-export const analyzeSentiment = async (reviewText) => {
+export const analyzeSentiment = async (reviewText: string): Promise<SentimentResult> => {
     try {
         const response = await groq.chat.completions.create({
             model: 'llama-3.3-70b-versatile',
@@ -19,7 +25,7 @@ export const analyzeSentiment = async (reviewText) => {
 
         const text = response.choices[0].message.content
         const clean = text.replace(/```json|```/g, '').trim()
-        const parsed = JSON.parse(clean)
+        const parsed = JSON.parse(clean) as SentimentResult;
 
         if (!parsed.sentiment || parsed.score === undefined) {
             throw new Error('Invalid sentiment response shape')
@@ -31,7 +37,7 @@ export const analyzeSentiment = async (reviewText) => {
     }
 }
 
-export const generateVerdict = async (reviews) => {
+export const generateVerdict = async (reviews: Array<{ text: string }>): Promise<string> => {
     try {
         const recent = reviews.slice(-20)
         const reviewTexts = recent.map((r, i) => `Review ${i + 1}: ${r.text}`).join('\n')
