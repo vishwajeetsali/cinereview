@@ -2,10 +2,11 @@ import Verdict from "../models/Verdict.js";
 import Review from "../models/Review.js";
 import { generateVerdict as aiGenerateVerdict } from '../services/aiService.js';
 import redis from '../config/redis.js';
+import { Request, Response } from "express";
 
-export const getVerdict = async (req, res) => {
+export const getVerdict = async (req: Request, res: Response) => {
     try {
-        const { tmdbId } = req.params;
+        const tmdbId = Number(req.params.tmdbId);
 
         const cached = await redis.get(`verdict:${tmdbId}`);
         if (cached) return res.status(200).json(cached);
@@ -24,9 +25,9 @@ export const getVerdict = async (req, res) => {
     }
 };
 
-export const generateVerdict = async (req, res) => {
+export const generateVerdict = async (req: Request, res: Response) => {
     try {
-        const { tmdbId } = req.params;
+        const tmdbId = Number(req.params.tmdbId);
 
         const reviews = await Review.find({ tmdbId });
 

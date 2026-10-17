@@ -4,13 +4,15 @@ import Comment from '../models/Comment.js';
 import Review from '../models/Review.js';
 import Notification from '../models/Notification.js';
 import mongoose from 'mongoose';
+import { Request, Response } from 'express';
+
 
 let io;
-export const setIO = (ioInstance) => { io = ioInstance; };
+export const setIO = (ioInstance: any) => { io = ioInstance; };
 
-export const getComments = async (req, res) => {
+export const getComments = async (req: Request, res: Response) => {
     try {
-        const { reviewId } = req.params;
+        const reviewId = req.params.reviewId as string;
         const comments = await Comment.find({ reviewId })
             .populate('userId', 'name avatar')
             .sort({ createdAt: 1 });
@@ -21,9 +23,9 @@ export const getComments = async (req, res) => {
     }
 };
 
-export const addComment = async (req, res) => {
+export const addComment = async (req: Request, res: Response) => {
     try {
-        const { reviewId } = req.params;
+        const reviewId = req.params.reviewId as string;
         const { userId } = req.user;
         const sanitizedText = xss(req.body.text);
 
@@ -53,7 +55,7 @@ export const addComment = async (req, res) => {
     }
 };
 
-export const deleteComment = async (req, res) => {
+export const deleteComment = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const comment = await Comment.findById(id);

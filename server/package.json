@@ -48,6 +48,7 @@
     "@types/nodemailer": "^8.0.2",
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
+    "@types/sanitize-html": "^2.16.2",
     "nodemon": "^3.1.14",
     "typescript": "^7.0.2"
   }

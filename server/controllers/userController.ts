@@ -2,9 +2,9 @@ import User from '../models/User.js';
 import Review from '../models/Review.js';
 import { sendFollowNotification } from '../services/emailService.js';
 import sanitizeHtml from 'sanitize-html';
+import { Request, Response } from 'express';
 
-
-export const getPublicProfile = async (req, res) => {
+export const getPublicProfile = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
 
@@ -27,7 +27,7 @@ export const getPublicProfile = async (req, res) => {
     }
 };
 
-export const toggleFollow = async (req, res) => {
+export const toggleFollow = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
         const currentUserId = req.user.userId;
@@ -41,7 +41,7 @@ export const toggleFollow = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        const isFollowing = targetUser.followers.includes(currentUserId);
+        const isFollowing = targetUser.followers.some(id => id.toString() === currentUserId);
         if (isFollowing) {
             await User.findByIdAndUpdate(userId, { $pull: { followers: currentUserId } });
             await User.findByIdAndUpdate(currentUserId, { $pull: { following: userId } });
@@ -66,12 +66,12 @@ export const toggleFollow = async (req, res) => {
     }
 };
 
-export const getFeed = async (req, res) => {
+export const getFeed = async (req: Request, res: Response) => {
     try {
         const currentUser = await User.findById(req.user.userId).select('following');
         if (!currentUser) return res.status(404).json({ message: 'User not found' });
 
-        const page = parseInt(req.query.page) || 1;
+        const page = parseInt(req.query.page as string) || 1;
         const limit = 10;
         const skip = (page - 1) * limit;
 
@@ -90,9 +90,9 @@ export const getFeed = async (req, res) => {
     }
 };
 
-export const searchUsers = async (req, res) => {
+export const searchUsers = async (req: Request, res: Response) => {
     try {
-        const { q } = req.query;
+        const q = req.query.q as string;
         if (!q) return res.status(200).json([]);
 
         const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -107,9 +107,9 @@ export const searchUsers = async (req, res) => {
     }
 };
 
-export const updateProfile = async (req, res) => {
+export const updateProfile = async (req: Request, res: Response) => {
     try {
-        const updates = {};
+        const updates: Record<string, any> = {};
         if (req.body.name) {
             const cleanName = sanitizeHtml(req.body.name, { allowedTags: [], allowedAttributes: {} }).trim();
             if (!cleanName) return res.status(400).json({ message: 'Invalid name' });
@@ -130,7 +130,7 @@ export const updateProfile = async (req, res) => {
     }
 };
 
-export const toggleWatchlist = async (req, res) => {
+export const toggleWatchlist = async (req: Request, res: Response) => {
     try {
         const { tmdbId, movieTitle, moviePoster } = req.body;
         const user = await User.findById(req.user.userId);
@@ -153,10 +153,10 @@ export const toggleWatchlist = async (req, res) => {
     }
 };
 
-export const getWatchlist = async (req, res) => {
+export const getWatchlist = async (req: Request, res: Response) => {
     try {
         const user = await User.findById(req.user.userId).select('watchlist');
-        const sorted = user.watchlist.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
+        const sorted = user.watchlist.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
         return res.json(sorted);
     } catch (error) {
         console.error(error);

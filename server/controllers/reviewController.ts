@@ -6,16 +6,19 @@ import mongoose from 'mongoose';
 import { analyzeSentiment, generateVerdict as aiGenerateVerdict } from '../services/aiService.js';
 import Verdict from '../models/Verdict.js';
 import { sendVerdictNotification } from '../services/emailService.js';
+import { Request, Response } from 'express';
 
 let io;
 
-export const setIO = (socketIO) => {
+export const setIO = (socketIO: any) => {
     io = socketIO;
 };
 
-export const createReview = async (req, res) => {
+export const createReview = async (req: Request, res: Response) => {
     try {
-        const { tmdbId, movieTitle, moviePoster, rating, text } = req.body;
+        const { movieTitle, moviePoster, text } = req.body;
+        const tmdbId = Number(req.body.tmdbId);
+        const rating = Number(req.body.rating);
         const { userId } = req.user;
 
         if (!tmdbId || !movieTitle || !rating || !text) {
@@ -71,9 +74,9 @@ export const createReview = async (req, res) => {
     }
 };
 
-export const getMovieReview = async (req, res) => {
+export const getMovieReview = async (req: Request, res: Response) => {
     try {
-        const { tmdbId } = req.params;
+        const tmdbId = Number(req.params.tmdbId);
         const reviews = await Review.find({ tmdbId }).populate('userId', 'name avatar');
         return res.status(200).json(reviews);
     } catch (error) {
@@ -82,7 +85,7 @@ export const getMovieReview = async (req, res) => {
     }
 };
 
-export const deleteReview = async (req, res) => {
+export const deleteReview = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const review = await Review.findById(id);
@@ -102,7 +105,7 @@ export const deleteReview = async (req, res) => {
     }
 };
 
-export const getUserReviews = async (req, res) => {
+export const getUserReviews = async (req: Request, res: Response) => {
     try {
         const reviews = await Review.find({ userId: req.user.userId }).sort({ createdAt: -1 });
         return res.status(200).json(reviews);
@@ -112,7 +115,7 @@ export const getUserReviews = async (req, res) => {
     }
 };
 
-export const editReview = async (req, res) => {
+export const editReview = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
         const { rating, text } = req.body;
@@ -137,12 +140,13 @@ export const editReview = async (req, res) => {
     }
 };
 
-export const toggleLike = async (req, res) => {
+export const toggleLike = async (req: Request, res: Response) => {
     try {
-        const review = await Review.findById(req.params.id);
+        const id = req.params.id as string;
+        const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
 
-        if (review.likes.includes(req.user.userId)) {
+        if (review.likes.some(id => id.toString() === req.user.userId)) {
             await Review.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user.userId } });
             return res.json({ liked: false, likeCount: review.likes.length - 1 });
         } else {
@@ -152,7 +156,7 @@ export const toggleLike = async (req, res) => {
                     userId: review.userId,
                     fromUserId: req.user.userId,
                     type: 'like',
-                    reviewId: new mongoose.Types.ObjectId(req.params.id)
+                    reviewId: new mongoose.Types.ObjectId(id)
                 });
                 if (io) io.to(`user_${review.userId}`).emit('newNotification');
             }

@@ -1,6 +1,8 @@
 import Notification from '../models/Notification.js'
+import { Request, Response } from 'express';
 
-export const getNotifications = async (req, res) => {
+
+export const getNotifications = async (req: Request, res: Response) => {
     try {
         const notifications = await Notification
             .find({ userId: req.user.userId })
@@ -14,7 +16,7 @@ export const getNotifications = async (req, res) => {
     }
 };
 
-export const markAsRead = async (req, res) => {
+export const markAsRead = async (req: Request, res: Response) => {
     try {
         await Notification.updateMany(
             { userId: req.user.userId, read: false },
@@ -27,7 +29,7 @@ export const markAsRead = async (req, res) => {
     }
 };
 
-export const getUnreadCount = async (req, res) => {
+export const getUnreadCount = async (req: Request, res: Response) => {
     try {
         const count = await Notification.countDocuments({
             userId: req.user.userId,
