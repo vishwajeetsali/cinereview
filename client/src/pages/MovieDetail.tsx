@@ -41,7 +41,7 @@ export default function MovieDetail() {
     const handleNewReview = (review: Review) => setReviews(prev => [review, ...prev]);
     const handleVerdictUpdated = (verdict: Verdict) => setVerdict(verdict);
 
-    useSocket(tmdbId, handleNewReview, handleVerdictUpdated);
+    useSocket(tmdbId || '', handleNewReview, handleVerdictUpdated);
 
     const isLoggedIn = !!user;
 
@@ -66,7 +66,7 @@ export default function MovieDetail() {
                 setMovie(movieRes.data);
                 setReviews(reviewsRes.data.reviews || reviewsRes.data || []);
                 setCredits(creditsRes.data.cast?.slice(0, 10) || []);
-                setCrew(creditsRes.data.crew?.filter(p =>
+                setCrew(creditsRes.data.crew?.filter((p: any) =>
                     ['Director', 'Screenplay', 'Producer'].includes(p.job)
                 ) || []);
 
@@ -77,12 +77,12 @@ export default function MovieDetail() {
 
                 try {
                     const similarRes = await api.get(`/api/movies/similar/${tmdbId}`)
-                    setSimilar(similarRes.data.results?.filter(m => m.poster_path).slice(0, 10) || [])
+                    setSimilar(similarRes.data.results?.filter((m: any) => m.poster_path).slice(0, 10) || [])
                 } catch { }
 
                 if (user) {
                     const watchlistRes = await api.get('/api/users/watchlist');
-                    const found = watchlistRes.data.some(item => item.tmdbId === Number(tmdbId));
+                    const found = watchlistRes.data.some((item: any) => item.tmdbId === Number(tmdbId));
                     setInWatchlist(found);
                 }
             } catch (err) {
@@ -99,7 +99,7 @@ export default function MovieDetail() {
 
     const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!reviewText.trim()) return;
+        if (!reviewText.trim() || !movie) return;
         try {
             setSubmitting(true);
             setReviewError("");
@@ -113,7 +113,7 @@ export default function MovieDetail() {
             setReviewText("");
             setRating(5);
             toast.success('Review posted!');
-        } catch (err) {
+        } catch (err: any) {
             setReviewError(err.response?.data?.message || "Could not submit review.");
         } finally {
             setSubmitting(false);
@@ -131,19 +131,20 @@ export default function MovieDetail() {
     };
 
     const handleLike = async (reviewId: string) => {
-        if (!user) return toast.error('Login to like')
+        const currentUserId = user?.id || user?._id;
+        if (!currentUserId) return toast.error('Login to like');
         try {
-            const res = await api.post(`/api/reviews/${reviewId}/like`)
+            const res = await api.post(`/api/reviews/${reviewId}/like`);
             setReviews(prev => prev.map(r => r._id === reviewId ? {
                 ...r,
                 likes: res.data.liked
-                    ? [...(r.likes || []), user.id]
-                    : (r.likes || []).filter(id => id !== user.id)
-            } : r))
+                    ? [...(r.likes || []), currentUserId]
+                    : (r.likes || []).filter(id => id !== currentUserId)
+            } : r));
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
-    }
+    };
 
     const handleWatchlist = async () => {
         try {
@@ -163,7 +164,7 @@ export default function MovieDetail() {
         ? `${import.meta.env.VITE_TMDB_IMAGE_BASE}${movie.poster_path}`
         : '/placeholder.png';
 
-    const sentimentBadgeBg = (sentiment) => {
+    const sentimentBadgeBg = (sentiment?: string) => {
         if (!sentiment) return "bg-zinc-700 text-zinc-300";
         const s = sentiment.toLowerCase();
         if (s === "positive") return "bg-emerald-900/60 text-emerald-300 border border-emerald-700/50";
@@ -268,7 +269,7 @@ export default function MovieDetail() {
 
                             {(movie.genres || []).length > 0 && (
                                 <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                                    {movie.genres.map((genre) => (
+                                    {movie.genres.map((genre: { id: number; name: string }) => (
                                         <span
                                             key={genre.id || genre.name}
                                             onClick={() => navigate(`/genre/${genre.id}`, { state: { genreName: genre.name } })}

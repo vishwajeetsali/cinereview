@@ -1,4 +1,4 @@
-const Fallback = ({ title, className }) => (
+const Fallback = ({ title, className }: { title?: string; className?: string }) => (
     <div className={`rounded-lg bg-zinc-900 border border-zinc-800 flex flex-col items-center justify-center gap-2 p-3 ${className}`}>
         <div className="w-8 h-8 bg-rose-600/20 border border-rose-600/30 rounded-md flex items-center justify-center">
             <span className="text-rose-500 text-sm">🎬</span>

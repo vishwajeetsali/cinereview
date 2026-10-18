@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     const updateUser = (updates: Partial<User>) => {
-        setUser(prev => ({ ...prev, ...updates }));
+        setUser(prev => prev ? ({ ...prev, ...updates }) : null);
     };
 
     return (

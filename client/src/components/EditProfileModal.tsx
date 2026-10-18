@@ -11,7 +11,7 @@ interface EditProfileModalProps {
 export default function EditProfileModal({ onClose, onSave }: EditProfileModalProps) {
     const { user, updateUser } = useAuth();
     const [name, setName] = useState(user?.name || "");
-    const [avatarFile, setAvatarFile] = useState(null);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
     const [preview, setPreview] = useState(user?.avatar || null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');

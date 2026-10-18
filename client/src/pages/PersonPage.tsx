@@ -101,7 +101,7 @@ export default function PersonPage() {
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             {filmography.map(m => (
-                                <MovieCard key={m.id} movie={{ ...m, title: m.title || m.name }} />
+                                <MovieCard key={m.id} movie={{ ...m, title: m.title || m.name || 'Untitled' }} />
                             ))}
                         </div>
                     )}

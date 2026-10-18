@@ -43,7 +43,7 @@ export default function PublicProfile() {
                 setProfile(res.data.user);
                 setReviews(res.data.reviews);
                 setReviewCount(res.data.reviewCount);
-                setIsFollowing(res.data.user.followers.some(f => f._id === user?.id));
+                setIsFollowing(res.data.user.followers.some((f: { _id: string }) => f._id === user?.id));
             } catch (err) {
                 console.error(err);
             } finally {
@@ -54,15 +54,16 @@ export default function PublicProfile() {
     }, [userId]);
 
     const handleFollow = async () => {
+        const currentUserId = user?.id || user?._id;
+        if (!userId || !currentUserId) return;
         try {
-            if (!userId) return;
             const res = await toggleFollow(userId);
             setIsFollowing(res.data.following);
             setProfile(prev => prev ? ({
                 ...prev,
                 followers: res.data.following
-                    ? [...prev.followers, { _id: user.id }]
-                    : prev.followers.filter(f => f._id !== user.id),
+                    ? [...prev.followers, { _id: currentUserId }]
+                    : prev.followers.filter(f => f._id !== currentUserId),
             }) : null);
         } catch (err) {
             console.error(err);
