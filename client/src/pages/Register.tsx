@@ -20,12 +20,12 @@ export default function Register() {
         return () => { document.title = 'CineReview' }
     }, [])
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
@@ -47,7 +47,7 @@ export default function Register() {
             await api.post("/api/auth/register", formData);
             toast.success("Account created! Please login.");
             navigate("/login");
-        } catch (err) {
+        } catch (err: any) {
             setError(err.response?.data?.message || "Registration failed. Please check your details.");
         } finally {
             setLoading(false);

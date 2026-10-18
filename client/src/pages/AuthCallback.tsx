@@ -19,7 +19,7 @@ export default function AuthCallback() {
                 const payload = JSON.parse(atob(token.split('.')[1]));
 
                 const res = await api.get(`/api/users/${payload.userId}`);
-                await login({
+                login({
                     id: payload.userId,
                     name: payload.name,
                     avatar: res.data.user.avatar || null,

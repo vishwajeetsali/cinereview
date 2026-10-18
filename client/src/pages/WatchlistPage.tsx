@@ -6,8 +6,8 @@ import { X, Bookmark } from 'lucide-react'
 import MovieCard from '../components/MovieCard';
 
 export default function WatchlistPage() {
-    const [movies, setMovies] = useState([])
-    const [loading, setLoading] = useState(true)
+    const [movies, setMovies] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         document.title = 'My Watchlist — CineReview'
@@ -29,7 +29,7 @@ export default function WatchlistPage() {
         fetchWatchlist()
     }, [])
 
-    const handleRemove = async (e, tmdbId) => {
+    const handleRemove = async (e: React.MouseEvent, tmdbId: number) => {
         e.stopPropagation() // Prevents triggering the movie navigation underneath
 
         // 1. Optimistic UI Update: Remove instantly

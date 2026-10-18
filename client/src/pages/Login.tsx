@@ -19,12 +19,12 @@ export default function Login() {
         return () => { document.title = 'CineReview' }
     }, [])
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
 
@@ -43,11 +43,11 @@ export default function Login() {
             const res = await api.post("/api/auth/login", formData);
             const { user, accessToken } = res.data;
             window.accessToken = accessToken;
-            await login(user, accessToken);
+            login(user, accessToken);
             toast.success('Welcome back!');
             const from = location.state?.from || "/home";
             navigate(from);
-        } catch (err) {
+        } catch (err: any) {
             setError(err.response?.data?.message || "Login failed. Please check your details.");
         } finally {
             setLoading(false);
