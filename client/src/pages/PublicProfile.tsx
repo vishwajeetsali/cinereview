@@ -3,8 +3,8 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getPublicProfile, toggleFollow } from '../api/users';
 import { useAuth } from '../context/AuthContext';
 import { Review } from '../types';
-import PageTransition from '../components/PageTransition.js';
-import MoviePoster from '../components/MoviePoster.js';
+import PageTransition from '../components/PageTransition';
+import MoviePoster from '../components/MoviePoster';
 
 interface PublicProfileUser {
     _id: string;

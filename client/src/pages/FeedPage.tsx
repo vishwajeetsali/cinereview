@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
-import PageTransition from '../components/PageTransition.js';
-import MoviePoster from '../components/MoviePoster.js';
-import ReviewCardSkeleton from '../components/ReviewCardSkeleton.js'
+import PageTransition from '../components/PageTransition';
+import MoviePoster from '../components/MoviePoster';
+import ReviewCardSkeleton from '../components/ReviewCardSkeleton';
 import { Rss } from 'lucide-react';
 import { getFeed } from '../api/users';
 import { Review, ReviewUser } from '../types';
