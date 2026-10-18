@@ -23,7 +23,7 @@ export const analyzeSentiment = async (reviewText: string): Promise<SentimentRes
             ]
         })
 
-        const text = response.choices[0].message.content
+        const text = response.choices[0]?.message?.content || '';
         const clean = text.replace(/```json|```/g, '').trim()
         const parsed = JSON.parse(clean) as SentimentResult;
 
@@ -32,7 +32,7 @@ export const analyzeSentiment = async (reviewText: string): Promise<SentimentRes
         }
 
         return parsed
-    } catch (error) {
+    } catch (error: any) {
         throw new Error(`Sentiment analysis failed: ${error.message}`)
     }
 }
@@ -55,8 +55,8 @@ export const generateVerdict = async (reviews: Array<{ text: string }>): Promise
             ]
         })
 
-        return response.choices[0].message.content
-    } catch (error) {
+        return response.choices[0]?.message?.content || '';
+    } catch (error: any) {
         throw new Error(`Verdict generation failed: ${error.message}`)
     }
 }

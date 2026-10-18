@@ -8,7 +8,7 @@ import Verdict from '../models/Verdict.js';
 import { sendVerdictNotification } from '../services/emailService.js';
 import { Request, Response } from 'express';
 
-let io;
+let io: any;
 
 export const setIO = (socketIO: any) => {
     io = socketIO;
@@ -19,7 +19,7 @@ export const createReview = async (req: Request, res: Response) => {
         const { movieTitle, moviePoster, text } = req.body;
         const tmdbId = Number(req.body.tmdbId);
         const rating = Number(req.body.rating);
-        const { userId } = req.user;
+        const userId = req.user!.userId;
 
         if (!tmdbId || !movieTitle || !rating || !text) {
             return res.status(400).json({ message: 'tmdbId, movieTitle, rating and text are required.' });
@@ -91,8 +91,8 @@ export const deleteReview = async (req: Request, res: Response) => {
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Not Found' });
 
-        const user = await User.findById(req.user.userId);
-        if (review.userId.toString() === req.user.userId || user.role === 'admin' || user.role === 'mod') {
+        const user = await User.findById(req.user!.userId);
+        if (review.userId.toString() === req.user!.userId || user?.role === 'admin' || user?.role === 'mod') {
             await Review.findByIdAndDelete(id);
         } else {
             return res.status(403).json({ message: 'Forbidden' });
@@ -107,7 +107,7 @@ export const deleteReview = async (req: Request, res: Response) => {
 
 export const getUserReviews = async (req: Request, res: Response) => {
     try {
-        const reviews = await Review.find({ userId: req.user.userId }).sort({ createdAt: -1 });
+        const reviews = await Review.find({ userId: req.user!.userId }).sort({ createdAt: -1 });
         return res.status(200).json(reviews);
     } catch (error) {
         console.error(error);
@@ -122,7 +122,7 @@ export const editReview = async (req: Request, res: Response) => {
 
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
-        if (review.userId.toString() !== req.user.userId) return res.status(403).json({ message: 'Forbidden' });
+        if (review.userId.toString() !== req.user!.userId) return res.status(403).json({ message: 'Forbidden' });
 
         const sanitizedText = xss(text);
         review.rating = rating;
@@ -146,15 +146,16 @@ export const toggleLike = async (req: Request, res: Response) => {
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
 
-        if (review.likes.some(id => id.toString() === req.user.userId)) {
-            await Review.findByIdAndUpdate(req.params.id, { $pull: { likes: req.user.userId } });
+        const currentUserId = req.user!.userId;
+        if (review.likes.some(id => id.toString() === currentUserId)) {
+            await Review.findByIdAndUpdate(req.params.id, { $pull: { likes: currentUserId } });
             return res.json({ liked: false, likeCount: review.likes.length - 1 });
         } else {
-            await Review.findByIdAndUpdate(req.params.id, { $addToSet: { likes: req.user.userId } });
-            if (review.userId.toString() !== req.user.userId) {
+            await Review.findByIdAndUpdate(req.params.id, { $addToSet: { likes: currentUserId } });
+            if (review.userId.toString() !== currentUserId) {
                 await Notification.create({
                     userId: review.userId,
-                    fromUserId: req.user.userId,
+                    fromUserId: currentUserId,
                     type: 'like',
                     reviewId: new mongoose.Types.ObjectId(id)
                 });

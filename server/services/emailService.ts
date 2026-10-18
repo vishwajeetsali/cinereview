@@ -32,7 +32,7 @@ export const sendFollowNotification = async (toEmail: string, toName: string, fo
     </div>
 </div>`
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Follow email failed:', error.message);
     }
 };
@@ -60,7 +60,7 @@ export const sendVerdictNotification = async (toEmail: string, toName: string, m
     </div>
 </div>`
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Verdict email failed:', error.message);
     }
 };

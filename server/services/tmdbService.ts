@@ -11,7 +11,7 @@ const tmdbAxios = axios.create({
 
 type ID = number | string;
 
-export const searchMovies = async (query: string, page = 1) => {
+export const searchMovies = async (query: string, page = 1): Promise<any> => {
     try {
         const cacheKey = `tmdb:search:${query}:${page}`;
         const cached = await redis.get(cacheKey);
@@ -23,12 +23,12 @@ export const searchMovies = async (query: string, page = 1) => {
 
         await redis.set(cacheKey, response.data, { ex: 600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         throw new Error(`TMDB search failed: ${error.message}`);
     }
 };
 
-export const getMovieDetails = async (tmdbId: ID, retries = 3) => {
+export const getMovieDetails = async (tmdbId: ID, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:movie:${tmdbId}`);
         if (cached) return cached;
@@ -39,7 +39,7 @@ export const getMovieDetails = async (tmdbId: ID, retries = 3) => {
 
         await redis.set(`tmdb:movie:${tmdbId}`, response.data, { ex: 3600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getMovieDetails(tmdbId, retries - 1);
@@ -48,7 +48,7 @@ export const getMovieDetails = async (tmdbId: ID, retries = 3) => {
     }
 };
 
-export const getPopularMovies = async (page = 1, retries = 3) => {
+export const getPopularMovies = async (page = 1, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:popular:${page}`);
         if (cached) return cached;
@@ -59,7 +59,7 @@ export const getPopularMovies = async (page = 1, retries = 3) => {
 
         await redis.set(`tmdb:popular:${page}`, response.data, { ex: 600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getPopularMovies(page, retries - 1);
@@ -68,7 +68,7 @@ export const getPopularMovies = async (page = 1, retries = 3) => {
     }
 };
 
-export const getNowPlayingMovies = async (page = 1, retries = 3) => {
+export const getNowPlayingMovies = async (page = 1, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:now_playing:${page}`);
         if (cached) return cached;
@@ -79,7 +79,7 @@ export const getNowPlayingMovies = async (page = 1, retries = 3) => {
 
         await redis.set(`tmdb:now_playing:${page}`, response.data, { ex: 600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getNowPlayingMovies(page, retries - 1);
@@ -88,7 +88,7 @@ export const getNowPlayingMovies = async (page = 1, retries = 3) => {
     }
 };
 
-export const getMoviesByGenre = async (genreId: ID, page: number, sort_by: string, retries = 3) => {
+export const getMoviesByGenre = async (genreId: ID, page = 1, sort_by = 'popularity.desc', retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:genre:${genreId}:${page}:${sort_by}`);
         if (cached) return cached;
@@ -99,7 +99,7 @@ export const getMoviesByGenre = async (genreId: ID, page: number, sort_by: strin
 
         await redis.set(`tmdb:genre:${genreId}:${page}:${sort_by}`, response.data, { ex: 600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getMoviesByGenre(genreId, page, sort_by, retries - 1);
@@ -108,7 +108,7 @@ export const getMoviesByGenre = async (genreId: ID, page: number, sort_by: strin
     }
 };
 
-export const getTrendingMovies = async (page = 1, retries = 3) => {
+export const getTrendingMovies = async (page = 1, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:trending:${page}`);
         if (cached) return cached;
@@ -119,7 +119,7 @@ export const getTrendingMovies = async (page = 1, retries = 3) => {
 
         await redis.set(`tmdb:trending:${page}`, response.data, { ex: 600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getTrendingMovies(page, retries - 1);
@@ -128,7 +128,7 @@ export const getTrendingMovies = async (page = 1, retries = 3) => {
     }
 };
 
-export const getMovieCredits = async (tmdbId: ID, retries = 3) => {
+export const getMovieCredits = async (tmdbId: ID, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:credits:${tmdbId}`);
         if (cached) return cached;
@@ -139,7 +139,7 @@ export const getMovieCredits = async (tmdbId: ID, retries = 3) => {
 
         await redis.set(`tmdb:credits:${tmdbId}`, response.data, { ex: 3600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getMovieCredits(tmdbId, retries - 1);
@@ -148,7 +148,7 @@ export const getMovieCredits = async (tmdbId: ID, retries = 3) => {
     }
 };
 
-export const getSimilarMovies = async (tmdbId: ID, retries = 3) => {
+export const getSimilarMovies = async (tmdbId: ID, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:similar:${tmdbId}`);
         if (cached) return cached;
@@ -159,7 +159,7 @@ export const getSimilarMovies = async (tmdbId: ID, retries = 3) => {
 
         await redis.set(`tmdb:similar:${tmdbId}`, response.data, { ex: 3600 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getSimilarMovies(tmdbId, retries - 1);
@@ -168,7 +168,7 @@ export const getSimilarMovies = async (tmdbId: ID, retries = 3) => {
     }
 };
 
-export const getPersonDetails = async (personId: ID, retries = 3) => {
+export const getPersonDetails = async (personId: ID, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:person:${personId}`);
         if (cached) return cached;
@@ -179,7 +179,7 @@ export const getPersonDetails = async (personId: ID, retries = 3) => {
 
         await redis.set(`tmdb:person:${personId}`, response.data, { ex: 86400 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getPersonDetails(personId, retries - 1);
@@ -188,7 +188,7 @@ export const getPersonDetails = async (personId: ID, retries = 3) => {
     }
 };
 
-export const getPersonCredits = async (personId: ID, retries = 3) => {
+export const getPersonCredits = async (personId: ID, retries = 3): Promise<any> => {
     try {
         const cached = await redis.get(`tmdb:person:${personId}:credits`);
         if (cached) return cached;
@@ -199,7 +199,7 @@ export const getPersonCredits = async (personId: ID, retries = 3) => {
 
         await redis.set(`tmdb:person:${personId}:credits`, response.data, { ex: 86400 });
         return response.data;
-    } catch (error) {
+    } catch (error: any) {
         if (retries > 0 && error.code === 'ECONNRESET') {
             await new Promise(r => setTimeout(r, 500));
             return getPersonCredits(personId, retries - 1);

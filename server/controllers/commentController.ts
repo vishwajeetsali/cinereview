@@ -7,7 +7,7 @@ import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 
 
-let io;
+let io: any;
 export const setIO = (ioInstance: any) => { io = ioInstance; };
 
 export const getComments = async (req: Request, res: Response) => {
@@ -26,7 +26,7 @@ export const getComments = async (req: Request, res: Response) => {
 export const addComment = async (req: Request, res: Response) => {
     try {
         const reviewId = req.params.reviewId as string;
-        const { userId } = req.user;
+        const userId = req.user!.userId;
         const sanitizedText = xss(req.body.text);
 
         if (!sanitizedText?.trim()) {
@@ -61,8 +61,8 @@ export const deleteComment = async (req: Request, res: Response) => {
         const comment = await Comment.findById(id);
         if (!comment) return res.status(404).json({ message: 'Not Found' });
 
-        const user = await User.findById(req.user.userId);
-        if (comment.userId.toString() === req.user.userId || user.role === 'admin' || user.role === 'mod') {
+        const user = await User.findById(req.user!.userId);
+        if (comment.userId.toString() === req.user!.userId || user?.role === 'admin' || user?.role === 'mod') {
             await Comment.findByIdAndDelete(id);
         } else {
             return res.status(403).json({ message: 'Forbidden' });

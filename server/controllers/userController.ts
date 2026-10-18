@@ -30,9 +30,9 @@ export const getPublicProfile = async (req: Request, res: Response) => {
 export const toggleFollow = async (req: Request, res: Response) => {
     try {
         const { userId } = req.params;
-        const currentUserId = req.user.userId;
+        const currentUserId = req.user!.userId;
 
-        if (userId === currentUserId.toString()) {
+        if (!currentUserId || userId === currentUserId.toString()) {
             return res.status(400).json({ message: "Cannot follow Yourself" });
         }
 
@@ -53,7 +53,9 @@ export const toggleFollow = async (req: Request, res: Response) => {
         if (!isFollowing) {
             try {
                 const currentUser = await User.findById(currentUserId).select('name');
-                await sendFollowNotification(targetUser.email, targetUser.name, currentUser.name);
+                if (currentUser) {
+                    await sendFollowNotification(targetUser.email, targetUser.name, currentUser.name);
+                }
             } catch {
                 // email failure shouldn't break follow
             }
@@ -68,7 +70,7 @@ export const toggleFollow = async (req: Request, res: Response) => {
 
 export const getFeed = async (req: Request, res: Response) => {
     try {
-        const currentUser = await User.findById(req.user.userId).select('following');
+        const currentUser = await User.findById(req.user!.userId).select('following');
         if (!currentUser) return res.status(404).json({ message: 'User not found' });
 
         const page = parseInt(req.query.page as string) || 1;
@@ -118,7 +120,7 @@ export const updateProfile = async (req: Request, res: Response) => {
         if (req.file) updates.avatar = req.file.path;
 
         const user = await User.findByIdAndUpdate(
-            req.user.userId,
+            req.user!.userId,
             updates,
             { new: true }
         ).select('-password -refreshToken');
@@ -133,15 +135,16 @@ export const updateProfile = async (req: Request, res: Response) => {
 export const toggleWatchlist = async (req: Request, res: Response) => {
     try {
         const { tmdbId, movieTitle, moviePoster } = req.body;
-        const user = await User.findById(req.user.userId);
+        const user = await User.findById(req.user!.userId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
         const alreadyInList = user.watchlist.some(item => item.tmdbId === Number(tmdbId));
 
         if (alreadyInList) {
-            await User.findByIdAndUpdate(req.user.userId, {
+            await User.findByIdAndUpdate(req.user!.userId, {
                 $pull: { watchlist: { tmdbId: Number(tmdbId) } }
             });
         } else {
-            await User.findByIdAndUpdate(req.user.userId, {
+            await User.findByIdAndUpdate(req.user!.userId, {
                 $push: { watchlist: { tmdbId: Number(tmdbId), movieTitle, moviePoster, addedAt: new Date() } }
             });
         }
@@ -155,8 +158,9 @@ export const toggleWatchlist = async (req: Request, res: Response) => {
 
 export const getWatchlist = async (req: Request, res: Response) => {
     try {
-        const user = await User.findById(req.user.userId).select('watchlist');
-        const sorted = user.watchlist.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
+        const user = await User.findById(req.user!.userId).select('watchlist');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        const sorted = user.watchlist.sort((a, b) => new Date(b.addedAt || 0).getTime() - new Date(a.addedAt || 0).getTime());
         return res.json(sorted);
     } catch (error) {
         console.error(error);

@@ -11,7 +11,7 @@ passport.use(new GoogleStrategy({
         const email = profile.emails?.[0]?.value;
         const avatar = profile.photos?.[0]?.value;
 
-        if (!email) return done(new Error('No email from Google'), null);
+        if (!email) return done(new Error('No email from Google'), false);
 
         const userByGoogleId = await User.findOne({ googleId: profile.id });
         if (userByGoogleId) return done(null, userByGoogleId);
@@ -31,7 +31,7 @@ passport.use(new GoogleStrategy({
         });
         return done(null, newUser);
     } catch (error) {
-        done(error, null);
+        done(error as any, false);
     }
 }));
 

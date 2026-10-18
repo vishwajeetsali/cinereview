@@ -19,7 +19,7 @@ export const rateLimitMiddleware = async (req: Request, res: Response, next: Nex
         }
 
         next();
-    } catch (error) {
+    } catch (error: any) {
         console.error('Rate limiter error:', error.message)
         next() // fail open — don't block request if rate limiter is down
     }

@@ -60,7 +60,7 @@ export const login = async (req: Request, res: Response) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password, user.password || '');
         if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
         const accessToken = generateAccessToken(user._id.toString(), user.name, user.role);
@@ -130,9 +130,11 @@ export const logout = async (req: Request, res: Response) => {
 export const googleCallback = async (req: Request, res: Response) => {
     try {
         const user = req.user;
+        if (!user) return res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
 
-        const accessToken = generateAccessToken(user._id, user.name, user.role);
-        const refreshToken = generateRefreshToken(user._id);
+        const userId = user._id?.toString() || user.userId || '';
+        const accessToken = generateAccessToken(userId, user.name || '', user.role || 'user');
+        const refreshToken = generateRefreshToken(userId);
 
         user.refreshToken = refreshToken;
         await user.save();

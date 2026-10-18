@@ -107,7 +107,7 @@ export const getPersonCredits = async (req: Request, res: Response) => {
         const personId = req.params.personId as string;
         const credits = await tmdbPersonCredits(personId);
         return res.status(200).json({
-            cast: credits.cast.sort((a, b) => b.popularity - a.popularity),
+            cast: credits.cast.sort((a: any, b: any) => b.popularity - a.popularity),
             crew: credits.crew
         });
     } catch (error) {
