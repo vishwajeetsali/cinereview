@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import PageTransition from '../components/PageTransition';
-
+import { Movie } from '../types';
 // ─── Data ───────────────────────────────────────────────────────────────────
+
+
 
 const FEATURES = [
     {
@@ -150,8 +152,15 @@ function MockNotif() {
 }
 
 // ─── BentoCard ───────────────────────────────────────────────────────────────
+interface BentoCardProps {
+    icon: string;
+    title: string;
+    desc: string;
+    span: string;
+    mock: string | null;
+}
 
-function BentoCard({ icon, title, desc, span, mock }) {
+function BentoCard({ icon, title, desc, span, mock }: BentoCardProps) {
     const spanClass =
         span === 'lg' ? 'col-span-12 md:col-span-7' :
             span === 'sm' ? 'col-span-12 md:col-span-5' :
@@ -179,7 +188,7 @@ function BentoCard({ icon, title, desc, span, mock }) {
 export default function LandingPage() {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [posters, setPosters] = useState([]);
+    const [posters, setPosters] = useState<Movie[]>([]);
 
     useEffect(() => {
         if (user) navigate('/home');
@@ -263,7 +272,7 @@ export default function LandingPage() {
                                 {/* duplicate for seamless loop */}
                                 <div
                                     className="flex flex-col gap-2.5 animate-scroll"
-                                    style={{ '--dur': `${38 + ci * 4}s` }}
+                                    style={{ ['--dur' as any]: `${38 + ci * 4}s` }}
                                 >
                                     {[...col, ...col].map((m, i) => (
                                         <img

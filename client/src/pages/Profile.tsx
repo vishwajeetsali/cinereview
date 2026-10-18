@@ -8,19 +8,26 @@ import { Trash2, Pencil } from 'lucide-react';
 import PageTransition from '../components/PageTransition';
 import EditProfileModal from "../components/EditProfileModal";
 import MoviePoster from '../components/MoviePoster';
-import ReviewCardSkeleton from '../components/ReviewCardSkeleton'
+import ReviewCardSkeleton from '../components/ReviewCardSkeleton';
+import { Review, User } from "../types";
+
+interface FollowUser {
+    _id: string;
+    name: string;
+    avatar?: string;
+}
 
 export default function Profile() {
     const { user } = useAuth();
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [profileData, setProfileData] = useState(null);
-    const [modalType, setModalType] = useState(null);
-    const [modalUsers, setModalUsers] = useState([]);
-    const [editingReview, setEditingReview] = useState(null);
-    const [editingProfile, setEditingProfile] = useState(false);
-    const [watchlistCount, setWatchlistCount] = useState(0);
-    const reviewsRef = useRef(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [profileData, setProfileData] = useState<User | null>(null);
+    const [modalType, setModalType] = useState<'followers' | 'following' | null>(null);
+    const [modalUsers, setModalUsers] = useState<FollowUser[]>([]);
+    const [editingReview, setEditingReview] = useState<Review | null>(null);
+    const [editingProfile, setEditingProfile] = useState<boolean>(false);
+    const [watchlistCount, setWatchlistCount] = useState<number>(0);
+    const reviewsRef = useRef<HTMLDivElement>(null);
 
     const avgRating = reviews.length
         ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
@@ -53,7 +60,7 @@ export default function Profile() {
         fetchData();
     }, [user]);
 
-    const handleDeleteReview = async (reviewId) => {
+    const handleDeleteReview = async (reviewId: string) => {
         if (!window.confirm("Delete this review?")) return;
         try {
             await api.delete(`/api/reviews/${reviewId}`);
@@ -114,7 +121,7 @@ export default function Profile() {
                         <div
                             onClick={() => {
                                 setModalType('followers');
-                                setModalUsers(profileData?.followers || []);
+                                setModalUsers((profileData?.followers as unknown as FollowUser[]) || []);
                             }}
                             className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 text-center cursor-pointer hover:border-zinc-600 transition"
                         >
@@ -126,7 +133,11 @@ export default function Profile() {
                         <div
                             onClick={() => {
                                 setModalType('following');
-                                setModalUsers(profileData?.following || []);
+                                setModalUsers((profileData?.following as unknown as FollowUser[]) || []);
+
+
+
+
                             }}
                             className="bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3 text-center cursor-pointer hover:border-zinc-600 transition"
                         >

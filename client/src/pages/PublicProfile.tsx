@@ -1,19 +1,28 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getPublicProfile, toggleFollow } from '../api/users.js';
-import { useAuth } from '../context/AuthContext.jsx';
-import PageTransition from '../components/PageTransition';
-import MoviePoster from '../components/MoviePoster';
+import { getPublicProfile, toggleFollow } from '../api/users';
+import { useAuth } from '../context/AuthContext';
+import { Review } from '../types';
+import PageTransition from '../components/PageTransition.js';
+import MoviePoster from '../components/MoviePoster.js';
+
+interface PublicProfileUser {
+    _id: string;
+    name: string;
+    avatar?: string | null;
+    followers: { _id: string }[];
+    following: { _id: string }[];
+}
 
 export default function PublicProfile() {
     const { user } = useAuth();
-    const { userId } = useParams();
+    const { userId } = useParams<{ userId: string }>();
     const navigate = useNavigate();
-    const [profile, setProfile] = useState(null);
-    const [reviews, setReviews] = useState([]);
-    const [reviewCount, setReviewCount] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [isFollowing, setIsFollowing] = useState(false);
+    const [profile, setProfile] = useState<PublicProfileUser | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [reviewCount, setReviewCount] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
     useEffect(() => {
         if (profile) document.title = `${profile.name} — CineReview`
@@ -29,6 +38,7 @@ export default function PublicProfile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
+                if (!userId) return;
                 const res = await getPublicProfile(userId);
                 setProfile(res.data.user);
                 setReviews(res.data.reviews);
@@ -45,14 +55,15 @@ export default function PublicProfile() {
 
     const handleFollow = async () => {
         try {
+            if (!userId) return;
             const res = await toggleFollow(userId);
             setIsFollowing(res.data.following);
-            setProfile(prev => ({
+            setProfile(prev => prev ? ({
                 ...prev,
                 followers: res.data.following
                     ? [...prev.followers, { _id: user.id }]
                     : prev.followers.filter(f => f._id !== user.id),
-            }));
+            }) : null);
         } catch (err) {
             console.error(err);
         }
