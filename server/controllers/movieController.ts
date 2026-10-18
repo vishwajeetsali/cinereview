@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 
 export const searchMovies = async (req: Request, res: Response) => {
     try {
-        const { q, page = 1 } = req.query;
+        const q = (req.query.q || req.query.query) as string;
+        const page = req.query.page || 1;
         if (!q) return res.status(400).json({ message: 'Query required' });
-        const movies = await tmdbSearch(q as string, Number(page));
+        const movies = await tmdbSearch(q, Number(page));
         return res.status(200).json(movies);
     } catch (error) {
         console.error(error);

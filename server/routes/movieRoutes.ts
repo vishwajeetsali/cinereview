@@ -9,6 +9,7 @@ router.get('/now-playing', getNowPlayingMovies);
 router.get('/trending', getTrendingMovies);
 router.get('/genre/:genreId', getMoviesByGenre);
 router.get('/similar/:tmdbId', getSimilarMovies);
+router.get('/:tmdbId/similar', getSimilarMovies);
 router.get('/person/:personId', getPersonDetails);
 router.get('/person/:personId/credits', getPersonCredits);
 router.get('/:tmdbId/credits', getMovieCredits);
