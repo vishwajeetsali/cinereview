@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-export default function useSocket(tmdbId, onNewReview, onVerdictUpdated) {
+export default function useSocket(tmdbId: number | string, onNewReview: (data: any) => void, onVerdictUpdated: (data: any) => void) {
     useEffect(() => {
         const socket = io(import.meta.env.VITE_API_URL);
 

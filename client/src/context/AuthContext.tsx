@@ -1,10 +1,21 @@
 import { createContext, useState, useContext, useEffect } from "react";
 import api from "../api/axios";
+import { User } from '../types';
 
-const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null);
+
+interface AuthContextType {
+    user: User | null;
+    authLoading: boolean;
+    login: (user: User, token: string) => void;
+    logout: () => void;
+    updateUser: (updates: Partial<User>) => void;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [user, setUser] = useState<User | null>(null);
     const [authLoading, setAuthLoading] = useState(true);
 
     useEffect(() => {
@@ -23,7 +34,7 @@ export function AuthProvider({ children }) {
         restoreSession();
     }, []);
 
-    const login = (newUser, token) => {
+    const login = (newUser: User, token: string) => {
         window.accessToken = token;
         setUser(newUser);
     };
@@ -33,7 +44,7 @@ export function AuthProvider({ children }) {
         window.accessToken = null;
     };
 
-    const updateUser = (updates) => {
+    const updateUser = (updates: Partial<User>) => {
         setUser(prev => ({ ...prev, ...updates }));
     };
 

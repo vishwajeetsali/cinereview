@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { io } from 'socket.io-client'
 
-export default function useCommentSocket(reviewId, onNewComment) {
+export default function useCommentSocket(reviewId: string, onNewComment: (comment: any) => void) {
     useEffect(() => {
         if (!reviewId) return
         const socket = io(import.meta.env.VITE_API_URL)
         socket.emit('joinReview', reviewId)
         socket.on('commentReceived', onNewComment)
-        return () => socket.disconnect()
+        return () => {
+            socket.disconnect()
+        };
     }, [reviewId])
 }
