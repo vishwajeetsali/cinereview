@@ -1,14 +1,14 @@
 import Verdict from "../models/Verdict.js";
 import Review from "../models/Review.js";
 import { generateVerdict as aiGenerateVerdict } from '../services/aiService.js';
-import redis from '../config/redis.js';
+import { cacheGet, cacheSet, cacheDel } from '../config/redis.js';
 import { Request, Response } from "express";
 
 export const getVerdict = async (req: Request, res: Response) => {
     try {
         const tmdbId = Number(req.params.tmdbId);
 
-        const cached = await redis.get(`verdict:${tmdbId}`);
+        const cached = await cacheGet(`verdict:${tmdbId}`);
         if (cached) return res.status(200).json(cached);
 
         const verdict = await Verdict.findOne({ tmdbId });
@@ -17,7 +17,7 @@ export const getVerdict = async (req: Request, res: Response) => {
             return res.status(404).json({ message: 'Verdict not found' });
         }
 
-        await redis.set(`verdict:${tmdbId}`, verdict, { ex: 3600 });
+        await cacheSet(`verdict:${tmdbId}`, verdict, { ex: 3600 });
         return res.status(200).json(verdict);
     } catch (error) {
         console.error(error);
@@ -57,7 +57,7 @@ export const generateVerdict = async (req: Request, res: Response) => {
             { new: true, upsert: true }
         );
 
-        await redis.del(`verdict:${tmdbId}`);
+        await cacheDel(`verdict:${tmdbId}`);
         return res.status(200).json(verdict);
     } catch (error) {
         console.error(error);
