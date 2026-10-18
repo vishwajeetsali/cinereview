@@ -5,16 +5,16 @@ import { useDebounce } from 'use-debounce'
 import MovieCardSkeleton from "../components/MovieCardSkeleton";
 import PageTransition from '../components/PageTransition'
 import MovieCard from '../components/MovieCard'
-
+import { Movie } from '../types';
 
 export default function Home() {
-    const [query, setQuery] = useState("");
-    const [popularMovies, setPopularMovies] = useState([]);
-    const [nowPlaying, setNowPlaying] = useState([]);
-    const [trendingMovies, setTrendingMovies] = useState([]);
-    const [pageLoading, setPageLoading] = useState(false);
-    const [suggestions, setSuggestions] = useState([])
-    const [showSuggestions, setShowSuggestions] = useState(false)
+    const [query, setQuery] = useState<string>("");
+    const [popularMovies, setPopularMovies] = useState<Movie[]>([]);
+    const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
+    const [trendingMovies, setTrendingMovies] = useState<Movie[]>([]);
+    const [pageLoading, setPageLoading] = useState<boolean>(false);
+    const [suggestions, setSuggestions] = useState<Movie[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
 
     const navigate = useNavigate();
@@ -66,13 +66,12 @@ export default function Home() {
         fetchSuggestions()
     }, [debouncedQuery]);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         if (!query.trim()) return;
         setShowSuggestions(false);
         navigate(`/search?q=${encodeURIComponent(query)}`);
     };
-
     return (
         <PageTransition>
             <div className="bg-zinc-950 min-h-screen text-zinc-100 overflow-x-hidden">
@@ -122,7 +121,9 @@ export default function Home() {
                                                         src={`${import.meta.env.VITE_TMDB_IMAGE_BASE}${movie.poster_path}`}
                                                         alt={movie.title}
                                                         className="w-12 h-16 object-cover rounded shrink-0"
-                                                        onError={(e) => { e.target.style.display = 'none' }}
+                                                        onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                                                            e.currentTarget.style.display = 'none';
+                                                        }}
                                                     />
                                                 ) : (
                                                     <div className="w-12 h-16 rounded shrink-0 bg-zinc-900 border border-zinc-800 flex items-center justify-center">

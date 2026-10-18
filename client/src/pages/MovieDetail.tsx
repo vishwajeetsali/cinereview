@@ -11,34 +11,35 @@ import toast from 'react-hot-toast';
 import PageTransition from '../components/PageTransition'
 import { Bookmark, BookmarkCheck } from 'lucide-react'
 import MovieCard from '../components/MovieCard';
+import { Movie, Review, Verdict, ReviewUser } from '../types';
 
 export default function MovieDetail() {
-    const { tmdbId } = useParams();
+    const { tmdbId } = useParams<{ tmdbId: string }>();
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const [movie, setMovie] = useState(null);
-    const [credits, setCredits] = useState([]);
-    const [crew, setCrew] = useState([]);
-    const [reviews, setReviews] = useState([]);
-    const [verdict, setVerdict] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [reviewsLoading, setReviewsLoading] = useState(true);
-    const [error, setError] = useState("");
-    const [reviewError, setReviewError] = useState("");
-    const [inWatchlist, setInWatchlist] = useState(false);
-    const [similar, setSimilar] = useState([]);
-    const [rating, setRating] = useState(5);
-    const [reviewText, setReviewText] = useState("");
-    const [submitting, setSubmitting] = useState(false);
-    const [editingReview, setEditingReview] = useState(null);
+    const [movie, setMovie] = useState<Movie | null>(null);
+    const [credits, setCredits] = useState<any[]>([]);
+    const [crew, setCrew] = useState<any[]>([]);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [verdict, setVerdict] = useState<Verdict | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [reviewsLoading, setReviewsLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
+    const [reviewError, setReviewError] = useState<string>("");
+    const [inWatchlist, setInWatchlist] = useState<boolean>(false);
+    const [similar, setSimilar] = useState<Movie[]>([]);
+    const [rating, setRating] = useState<number>(5);
+    const [reviewText, setReviewText] = useState<string>("");
+    const [submitting, setSubmitting] = useState<boolean>(false);
+    const [editingReview, setEditingReview] = useState<Review | null>(null);
 
     const appRating = reviews.length
         ? (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)
         : null;
 
-    const handleNewReview = (review) => setReviews(prev => [review, ...prev]);
-    const handleVerdictUpdated = (verdict) => setVerdict(verdict);
+    const handleNewReview = (review: Review) => setReviews(prev => [review, ...prev]);
+    const handleVerdictUpdated = (verdict: Verdict) => setVerdict(verdict);
 
     useSocket(tmdbId, handleNewReview, handleVerdictUpdated);
 
@@ -96,7 +97,7 @@ export default function MovieDetail() {
         if (tmdbId) fetchMovieData();
     }, [tmdbId]);
 
-    const handleReviewSubmit = async (e) => {
+    const handleReviewSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!reviewText.trim()) return;
         try {
@@ -119,7 +120,7 @@ export default function MovieDetail() {
         }
     };
 
-    const handleDeleteReview = async (reviewId) => {
+    const handleDeleteReview = async (reviewId: string) => {
         try {
             await api.delete(`/api/reviews/${reviewId}`);
             setReviews(prev => prev.filter(r => r._id !== reviewId));
@@ -129,7 +130,7 @@ export default function MovieDetail() {
         }
     };
 
-    const handleLike = async (reviewId) => {
+    const handleLike = async (reviewId: string) => {
         if (!user) return toast.error('Login to like')
         try {
             const res = await api.post(`/api/reviews/${reviewId}/like`)
@@ -148,15 +149,15 @@ export default function MovieDetail() {
         try {
             const res = await api.post('/api/users/watchlist/toggle', {
                 tmdbId: Number(tmdbId),
-                movieTitle: movie.title,
-                moviePoster: movie.poster_path
-            })
-            setInWatchlist(res.data.inWatchlist)
-            toast.success(res.data.inWatchlist ? 'Added to watchlist' : 'Removed from watchlist')
+                movieTitle: movie?.title,
+                moviePoster: movie?.poster_path
+            });
+            setInWatchlist(res.data.inWatchlist);
+            toast.success(res.data.inWatchlist ? 'Added to watchlist' : 'Removed from watchlist');
         } catch (err) {
-            console.error(err)
+            console.error(err);
         }
-    }
+    };
 
     const posterUrl = movie?.poster_path
         ? `${import.meta.env.VITE_TMDB_IMAGE_BASE}${movie.poster_path}`
@@ -405,73 +406,85 @@ export default function MovieDetail() {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {reviews.map((review, index) => (
-                                <div
-                                    key={review._id || review.id || index}
-                                    className="rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors p-5 space-y-3"
-                                >
-                                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300 shrink-0 overflow-hidden">
-                                                {review.userId?.avatar
-                                                    ? <img src={review.userId.avatar} alt="" className="w-full h-full object-cover" />
-                                                    : (review.userId?.name || review.username || "A").charAt(0).toUpperCase()
-                                                }
+                            {
+                                reviews.map((review, index) => {
+                                    const author = typeof review.userId === 'object' ? (review.userId as ReviewUser) : null;
+                                    const authorId = typeof review.userId === 'string' ? review.userId : author?._id;
+                                    const isOwner = Boolean(user?.id && user.id === authorId);
+                                    const isLiked = Boolean(user?.id && review.likes?.includes(user.id));
+
+                                    return (
+                                        <div
+                                            key={review._id || index}
+                                            className="rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors p-5 space-y-3"
+                                        >
+                                            <div className="flex items-start justify-between gap-2 flex-wrap">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-300 shrink-0 overflow-hidden">
+                                                        {author?.avatar ? (
+                                                            <img src={author.avatar} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            (author?.name || "A").charAt(0).toUpperCase()
+                                                        )}
+                                                    </div>
+                                                    <Link to={`/user/${authorId}`} className="text-sm font-medium text-zinc-200 hover:text-rose-400 transition-colors">
+                                                        {author?.name || "Anonymous"}
+                                                    </Link>
+                                                </div>
+
+                                                <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                                                    {review.sentiment && (
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${sentimentBadgeBg(review.sentiment)}`}>
+                                                            {review.sentiment}
+                                                        </span>
+                                                    )}
+                                                    {review.rating != null && (
+                                                        <span className="flex items-center gap-1 text-xs bg-zinc-800 px-2.5 py-1 rounded-md">
+                                                            <span className="text-yellow-400">★</span>
+                                                            <span className="text-zinc-200 font-medium">{review.rating}</span>
+                                                            <span className="text-zinc-600">/10</span>
+                                                        </span>
+                                                    )}
+                                                    {isOwner && (
+                                                        <div className="relative group">
+                                                            <button onClick={() => setEditingReview(review)} className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-500 hover:border-rose-500 hover:text-rose-400 transition">
+                                                                <Pencil size={14} />
+                                                            </button>
+                                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Edit</span>
+                                                        </div>
+                                                    )}
+                                                    {(isOwner || user?.role === 'mod' || user?.role === 'admin') && (
+                                                        <div className="relative group">
+                                                            <button onClick={() => handleDeleteReview(review._id)} className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-500 hover:border-rose-500 hover:text-rose-400 transition">
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                            <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Delete</span>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <Link to={`/user/${review.userId?._id}`} className="text-sm font-medium text-zinc-200 hover:text-rose-400 transition-colors">
-                                                {review.userId?.name || review.username || "Anonymous"}
-                                            </Link>
-                                        </div>
 
-                                        <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                                            {review.sentiment && (
-                                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${sentimentBadgeBg(review.sentiment)}`}>
-                                                    {review.sentiment}
-                                                </span>
-                                            )}
-                                            {review.rating != null && (
-                                                <span className="flex items-center gap-1 text-xs bg-zinc-800 px-2.5 py-1 rounded-md">
-                                                    <span className="text-yellow-400">★</span>
-                                                    <span className="text-zinc-200 font-medium">{review.rating}</span>
-                                                    <span className="text-zinc-600">/10</span>
-                                                </span>
-                                            )}
-                                            {user?.id === review.userId?._id && (
-                                                <div className="relative group">
-                                                    <button onClick={() => setEditingReview(review)} className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-500 hover:border-rose-500 hover:text-rose-400 transition">
-                                                        <Pencil size={14} />
-                                                    </button>
-                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Edit</span>
-                                                </div>
-                                            )}
-                                            {(user?.id === review.userId?._id || user?.role === 'mod' || user?.role === 'admin') && (
-                                                <div className="relative group">
-                                                    <button onClick={() => handleDeleteReview(review._id)} className="text-xs px-2 py-1 rounded border border-zinc-700 text-zinc-500 hover:border-rose-500 hover:text-rose-400 transition">
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Delete</span>
-                                                </div>
-                                            )}
+                                            <p className="text-zinc-400 text-sm leading-relaxed">
+                                                {review.text}
+                                            </p>
+                                            <span className="text-xs text-zinc-500">
+                                                {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                            <div className="relative group">
+                                                <button
+                                                    onClick={() => handleLike(review._id)}
+                                                    className={`flex items-center gap-1.5 text-xs transition ${isLiked ? 'text-rose-400' : 'text-zinc-500 hover:text-rose-400'}`}
+                                                >
+                                                    <Heart size={13} fill={isLiked ? 'currentColor' : 'none'} />
+                                                    {review.likes?.length || 0}
+                                                </button>
+                                                <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Like</span>
+                                            </div>
+                                            <CommentSection reviewId={review._id} user={user} />
                                         </div>
-                                    </div>
-
-                                    <p className="text-zinc-400 text-sm leading-relaxed">
-                                        {review.text || review.review || review.comment || ""}
-                                    </p>
-                                    <span className="text-xs text-zinc-500">
-                                        {new Date(review.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    </span>
-                                    <div className="relative group">
-                                        <button onClick={() => handleLike(review._id)}
-                                            className={`flex items-center gap-1.5 text-xs transition ${review.likes?.includes(user?.id) ? 'text-rose-400' : 'text-zinc-500 hover:text-rose-400'}`}>
-                                            <Heart size={13} fill={review.likes?.includes(user?.id) ? 'currentColor' : 'none'} />
-                                            {review.likes?.length || 0}
-                                        </button>
-                                        <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">Like</span>
-                                    </div>
-                                    <CommentSection reviewId={review._id} user={user} />
-                                </div>
-                            ))}
+                                    );
+                                })
+                            }
                         </div>
                     )}
                 </div>
