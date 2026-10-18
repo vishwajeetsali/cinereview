@@ -7,7 +7,13 @@ const Fallback = ({ title, className }) => (
     </div>
 );
 
-export default function MoviePoster({ path, title, className = "w-full aspect-[2/3]" }) {
+interface MoviePosterProps {
+    path?: string | null;
+    title?: string;
+    className?: string;
+}
+
+export default function MoviePoster({ path, title, className = "w-full aspect-[2/3]" }: MoviePosterProps) {
     const url = path ? `${import.meta.env.VITE_TMDB_IMAGE_BASE}${path}` : null;
 
     if (!url) return <Fallback title={title} className={className} />;
@@ -27,7 +33,7 @@ export default function MoviePoster({ path, title, className = "w-full aspect-[2
                     </div>
                     <span style="color:#71717a;font-size:11px;text-align:center;line-height:1.4">${title}</span>
                 `;
-                e.target.replaceWith(fallback);
+                (e.target as HTMLElement).replaceWith(fallback);
             }}
         />
     );

@@ -1,8 +1,16 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
 
-class ErrorBoundary extends Component {
-    constructor(props) {
+interface Props {
+    children: React.ReactNode;
+}
+
+interface State {
+    hasError: boolean;
+}
+
+class ErrorBoundary extends Component<Props, State> {
+    constructor(props: Props) {
         super(props)
         this.state = { hasError: false }
     }
@@ -11,7 +19,7 @@ class ErrorBoundary extends Component {
         return { hasError: true }
     }
 
-    componentDidCatch(error, info) {
+    componentDidCatch(error: Error, info: React.ErrorInfo) {
         console.error('ErrorBoundary caught:', error, info)
     }
 

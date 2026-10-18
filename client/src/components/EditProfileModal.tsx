@@ -3,7 +3,12 @@ import { useAuth } from "../context/AuthContext";
 import api from "../api/axios";
 import { Camera } from "lucide-react";
 
-export default function EditProfileModal({ onClose, onSave }) {
+interface EditProfileModalProps {
+    onClose: () => void;
+    onSave: (updatedUser: any) => void;
+}
+
+export default function EditProfileModal({ onClose, onSave }: EditProfileModalProps) {
     const { user, updateUser } = useAuth();
     const [name, setName] = useState(user?.name || "");
     const [avatarFile, setAvatarFile] = useState(null);
@@ -11,8 +16,8 @@ export default function EditProfileModal({ onClose, onSave }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
         if (!file) return;
         if (file.size > 2 * 1024 * 1024) {
             setError('Image must be under 2MB');

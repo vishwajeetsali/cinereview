@@ -1,4 +1,8 @@
-export default function SentimentChart({ sentimentBreakdown }) {
+interface SentimentChartProps {
+    sentimentBreakdown: { positive?: number; negative?: number; mixed?: number };
+}
+
+export default function SentimentChart({ sentimentBreakdown }: SentimentChartProps) {
     const { positive = 0, negative = 0, mixed = 0 } = sentimentBreakdown
     const total = positive + negative + mixed
     if (total === 0) return null

@@ -2,11 +2,17 @@ import { useState, useEffect } from 'react'
 import api from '../api/axios'
 import useCommentSocket from '../hooks/useCommentSocket'
 import { MessageCircle, Trash2 } from 'lucide-react'
+import { Comment, User } from '../types';
 
-export default function CommentSection({ reviewId, user }) {
-    const [open, setOpen] = useState(false)
-    const [comments, setComments] = useState([])
-    const [text, setText] = useState('')
+interface CommentSectionProps {
+    reviewId: string;
+    user: User | null;
+}
+
+export default function CommentSection({ reviewId, user }: CommentSectionProps) {
+    const [open, setOpen] = useState(false);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [text, setText] = useState('');
 
     useEffect(() => {
         if (!open) return
@@ -32,7 +38,7 @@ export default function CommentSection({ reviewId, user }) {
         }
     }
 
-    const handleDelete = async (commentId) => {
+    const handleDelete = async (commentId: string) => {
         try {
             await api.delete(`/api/comments/${commentId}`)
             setComments(prev => prev.filter(c => c._id !== commentId))

@@ -47,12 +47,11 @@ export interface Review {
 
 export interface Comment {
     _id: string;
-    userId: ReviewUser | string;
+    userId: ReviewUser;
     reviewId: string;
     text: string;
     createdAt: string;
 }
-
 export type NotificationType = "like" | "comment";
 
 export interface Notification {

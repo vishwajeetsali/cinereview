@@ -1,7 +1,13 @@
 import { useState } from 'react';
-import api from '../api/axios.jsx';
+import api from '../api/axios';
 
-export default function EditReviewModal({ review, onClose, onSave }) {
+interface EditReviewModalProps {
+    review: { _id: string; rating: number; text: string };
+    onClose: () => void;
+    onSave: (updatedReview: any) => void;
+}
+
+export default function EditReviewModal({ review, onClose, onSave }: EditReviewModalProps) {
     const [rating, setRating] = useState(review.rating);
     const [text, setText] = useState(review.text);
     const [submitting, setSubmitting] = useState(false);

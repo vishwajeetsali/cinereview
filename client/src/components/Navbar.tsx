@@ -11,7 +11,7 @@ export default function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const [notifOpen, setNotifOpen] = useState(false);
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState<any[]>([]);
     const [heroScrolled, setHeroScrolled] = useState(false)
     const { user, logout } = useAuth();
     const navigate = useNavigate();
@@ -31,7 +31,9 @@ export default function Navbar() {
         socket.on('newNotification', () => {
             setUnreadCount(prev => prev + 1)
         })
-        return () => socket.disconnect()
+        return () => {
+            socket.disconnect();
+        };
     }, [user])
 
     useEffect(() => {
@@ -41,14 +43,14 @@ export default function Navbar() {
     }, [])
 
     useEffect(() => {
-        const handleClick = (e) => {
-            if (!e.target.closest('.notif-wrapper')) setNotifOpen(false)
+        const handleClick = (e: MouseEvent) => {
+            if (!(e.target as HTMLElement)?.closest('.notif-wrapper')) setNotifOpen(false);
         }
         document.addEventListener('click', handleClick)
         return () => document.removeEventListener('click', handleClick)
     }, [])
 
-    const handleNavSearch = (e) => {
+    const handleNavSearch = (e: React.FormEvent) => {
         e.preventDefault()
         if (!navQuery.trim()) return
         navigate(`/search?q=${encodeURIComponent(navQuery)}`)
@@ -69,7 +71,7 @@ export default function Navbar() {
         }
     };
 
-    const handleBellClick = async (e) => {
+    const handleBellClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
         setNotifOpen(p => !p)
         if (!notifOpen) {

@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 import MoviePoster from './MoviePoster'
+import { Movie } from '../types';
 
-export default function MovieCard({ movie }) {
+
+export default function MovieCard({ movie }: { movie: Movie }) {
     const navigate = useNavigate()
     const year = movie.release_date?.split('-')[0] || 'N/A'
 
