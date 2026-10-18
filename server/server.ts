@@ -32,10 +32,23 @@ initSocket(io);
 setIO(io);
 setCommentIO(io);
 
+const allowedOrigins = [
+    process.env.CLIENT_URL,
+    process.env.CLIENT_URL?.replace(/\/$/, ''),
+    'http://localhost:5173',
+    'http://localhost:3000'
+].filter(Boolean) as string[];
+
 // Security
 app.use(helmet());
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes(origin.replace(/\/$/, ''))) {
+            callback(null, true);
+        } else {
+            callback(null, false);
+        }
+    },
     credentials: true,
 }));
 app.use(express.json());
@@ -77,10 +90,18 @@ app.get('/', (req: Request, res: Response) => {
 
 // Global error handler
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    if (err.name === 'CastError') {
+        return res.status(400).json({ message: 'Invalid resource identifier format.' });
+    }
     console.error(err.stack);
     res.status(500).json({ message: 'Internal server error' });
 });
 
-httpServer.listen(Number(process.env.PORT) || 5000, () => {
-    console.log(`Server running on ${process.env.PORT || 5000}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    httpServer.listen(Number(process.env.PORT) || 5000, () => {
+        console.log(`Server running on ${process.env.PORT || 5000}`);
+    });
+}
+
+export { app, httpServer };
+export default app;

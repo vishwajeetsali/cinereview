@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon dist/server.js"
+    "dev": "nodemon dist/server.js",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +31,7 @@
     "mongoose": "^9.6.2",
     "multer": "^2.1.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "nodemailer": "^8.0.10",
+    "nodemailer": "^10.1.2",
     "openai": "^6.38.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
@@ -50,7 +51,10 @@
     "@types/passport": "^1.0.17",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/sanitize-html": "^2.16.2",
+    "@types/supertest": "^7.2.1",
     "nodemon": "^3.1.14",
-    "typescript": "^7.0.2"
+    "supertest": "^7.3.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   }
 }

@@ -2,11 +2,15 @@ import User from '../models/User.js';
 import Review from '../models/Review.js';
 import { sendFollowNotification } from '../services/emailService.js';
 import sanitizeHtml from 'sanitize-html';
+import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 
 export const getPublicProfile = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.userId as string;
+        if (!userId || typeof userId !== 'string' || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
+        }
 
         const user = await User.findById(userId)
             .select('-password -refreshToken -email')
@@ -29,8 +33,12 @@ export const getPublicProfile = async (req: Request, res: Response) => {
 
 export const toggleFollow = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.params;
+        const userId = req.params.userId as string;
         const currentUserId = req.user!.userId;
+
+        if (!userId || typeof userId !== 'string' || !mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
+        }
 
         if (!currentUserId || userId === currentUserId.toString()) {
             return res.status(400).json({ message: "Cannot follow Yourself" });
@@ -135,17 +143,28 @@ export const updateProfile = async (req: Request, res: Response) => {
 export const toggleWatchlist = async (req: Request, res: Response) => {
     try {
         const { tmdbId, movieTitle, moviePoster } = req.body;
+        const numTmdbId = Number(tmdbId);
+        if (!numTmdbId || isNaN(numTmdbId) || !Number.isInteger(numTmdbId) || numTmdbId < 1) {
+            return res.status(400).json({ message: 'Valid tmdbId is required.' });
+        }
+        if (!movieTitle || typeof movieTitle !== 'string' || !movieTitle.trim()) {
+            return res.status(400).json({ message: 'Valid movieTitle is required.' });
+        }
+
+        const cleanTitle = sanitizeHtml(movieTitle, { allowedTags: [], allowedAttributes: {} }).trim();
+        const cleanPoster = typeof moviePoster === 'string' ? sanitizeHtml(moviePoster, { allowedTags: [], allowedAttributes: {} }).trim() : '';
+
         const user = await User.findById(req.user!.userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
-        const alreadyInList = user.watchlist.some(item => item.tmdbId === Number(tmdbId));
+        const alreadyInList = user.watchlist.some(item => item.tmdbId === numTmdbId);
 
         if (alreadyInList) {
             await User.findByIdAndUpdate(req.user!.userId, {
-                $pull: { watchlist: { tmdbId: Number(tmdbId) } }
+                $pull: { watchlist: { tmdbId: numTmdbId } }
             });
         } else {
             await User.findByIdAndUpdate(req.user!.userId, {
-                $push: { watchlist: { tmdbId: Number(tmdbId), movieTitle, moviePoster, addedAt: new Date() } }
+                $push: { watchlist: { tmdbId: numTmdbId, movieTitle: cleanTitle, moviePoster: cleanPoster, addedAt: new Date() } }
             });
         }
 

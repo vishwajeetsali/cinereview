@@ -20,6 +20,10 @@ export const register = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Name, email and password are required.' });
         }
 
+        if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string') {
+            return res.status(400).json({ message: 'Name, email and password must be valid strings.' });
+        }
+
         if (!/\S+@\S+\.\S+/.test(email)) {
             return res.status(400).json({ message: 'Invalid email format.' });
         }
@@ -55,6 +59,10 @@ export const login = async (req: Request, res: Response) => {
 
         if (!email || !password) {
             return res.status(400).json({ message: 'Email and password are required.' });
+        }
+
+        if (typeof email !== 'string' || typeof password !== 'string') {
+            return res.status(400).json({ message: 'Email and password must be valid strings.' });
         }
 
         const user = await User.findOne({ email });
@@ -140,7 +148,7 @@ export const googleCallback = async (req: Request, res: Response) => {
         await user.save();
 
         res.cookie('refreshToken', refreshToken, cookieOptions);
-        res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${accessToken}`);
+        res.redirect(`${process.env.CLIENT_URL}/auth/callback#token=${accessToken}`);
     } catch (error) {
         console.error(error);
         res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);

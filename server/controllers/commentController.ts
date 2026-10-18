@@ -13,6 +13,10 @@ export const setIO = (ioInstance: any) => { io = ioInstance; };
 export const getComments = async (req: Request, res: Response) => {
     try {
         const reviewId = req.params.reviewId as string;
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'Invalid review ID format' });
+        }
+
         const comments = await Comment.find({ reviewId })
             .populate('userId', 'name avatar')
             .sort({ createdAt: 1 });
@@ -26,13 +30,17 @@ export const getComments = async (req: Request, res: Response) => {
 export const addComment = async (req: Request, res: Response) => {
     try {
         const reviewId = req.params.reviewId as string;
-        const userId = req.user!.userId;
-        const sanitizedText = xss(req.body.text);
+        if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+            return res.status(400).json({ message: 'Invalid review ID format' });
+        }
 
-        if (!sanitizedText?.trim()) {
+        const userId = req.user!.userId;
+        const text = req.body.text;
+        if (!text || typeof text !== 'string' || !text.trim()) {
             return res.status(400).json({ message: 'Comment text is required.' });
         }
 
+        const sanitizedText = xss(text.trim());
         const comment = await Comment.create({ reviewId, userId, text: sanitizedText });
         await comment.populate('userId', 'name avatar');
 
@@ -57,7 +65,11 @@ export const addComment = async (req: Request, res: Response) => {
 
 export const deleteComment = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id as string;
+        if (!id || typeof id !== 'string' || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid comment ID format' });
+        }
+
         const comment = await Comment.findById(id);
         if (!comment) return res.status(404).json({ message: 'Not Found' });
 

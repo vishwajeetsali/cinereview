@@ -21,17 +21,23 @@ export const createReview = async (req: Request, res: Response) => {
         const rating = Number(req.body.rating);
         const userId = req.user!.userId;
 
-        if (!tmdbId || !movieTitle || !rating || !text) {
-            return res.status(400).json({ message: 'tmdbId, movieTitle, rating and text are required.' });
+        if (!tmdbId || isNaN(tmdbId)) {
+            return res.status(400).json({ message: 'Valid tmdbId is required.' });
         }
-        if (rating < 1 || rating > 10) {
+        if (!movieTitle || typeof movieTitle !== 'string' || !movieTitle.trim()) {
+            return res.status(400).json({ message: 'Valid movieTitle is required.' });
+        }
+        if (!rating || isNaN(rating) || rating < 1 || rating > 10) {
             return res.status(400).json({ message: 'Rating must be between 1 and 10.' });
         }
+        if (!text || typeof text !== 'string' || !text.trim()) {
+            return res.status(400).json({ message: 'Review text cannot be empty.' });
+        }
 
-        const sanitizedText = xss(text);
+        const sanitizedText = xss(text.trim());
 
         const review = await Review.create({
-            userId, tmdbId, movieTitle, moviePoster, rating, text: sanitizedText
+            userId, tmdbId, movieTitle: movieTitle.trim(), moviePoster, rating, text: sanitizedText
         });
 
         const sentiment = await analyzeSentiment(sanitizedText);
@@ -77,6 +83,9 @@ export const createReview = async (req: Request, res: Response) => {
 export const getMovieReview = async (req: Request, res: Response) => {
     try {
         const tmdbId = Number(req.params.tmdbId);
+        if (!tmdbId || isNaN(tmdbId)) {
+            return res.status(400).json({ message: 'Valid tmdbId is required.' });
+        }
         const reviews = await Review.find({ tmdbId }).populate('userId', 'name avatar');
         return res.status(200).json(reviews);
     } catch (error) {
@@ -87,7 +96,11 @@ export const getMovieReview = async (req: Request, res: Response) => {
 
 export const deleteReview = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id as string;
+        if (!id || typeof id !== 'string' || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid review ID format' });
+        }
+
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Not Found' });
 
@@ -117,15 +130,26 @@ export const getUserReviews = async (req: Request, res: Response) => {
 
 export const editReview = async (req: Request, res: Response) => {
     try {
-        const { id } = req.params;
+        const id = req.params.id as string;
+        if (!id || typeof id !== 'string' || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid review ID format' });
+        }
+
         const { rating, text } = req.body;
+        const numRating = Number(rating);
+        if (!numRating || isNaN(numRating) || numRating < 1 || numRating > 10) {
+            return res.status(400).json({ message: 'Rating must be a number between 1 and 10.' });
+        }
+        if (!text || typeof text !== 'string' || !text.trim()) {
+            return res.status(400).json({ message: 'Review text cannot be empty.' });
+        }
 
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
         if (review.userId.toString() !== req.user!.userId) return res.status(403).json({ message: 'Forbidden' });
 
-        const sanitizedText = xss(text);
-        review.rating = rating;
+        const sanitizedText = xss(text.trim());
+        review.rating = numRating;
         review.text = sanitizedText;
 
         const sentiment = await analyzeSentiment(sanitizedText);
@@ -143,6 +167,10 @@ export const editReview = async (req: Request, res: Response) => {
 export const toggleLike = async (req: Request, res: Response) => {
     try {
         const id = req.params.id as string;
+        if (!id || typeof id !== 'string' || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: 'Invalid review ID format' });
+        }
+
         const review = await Review.findById(id);
         if (!review) return res.status(404).json({ message: 'Review not found' });
 

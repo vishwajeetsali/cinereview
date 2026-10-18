@@ -12,7 +12,8 @@ export default function AuthCallback() {
     useEffect(() => {
         const handleCallback = async () => {
             try {
-                const token = searchParams.get('token');
+                const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+                const token = hashParams.get('token') || searchParams.get('token');
                 if (!token) return navigate('/login');
 
                 window.accessToken = token;
