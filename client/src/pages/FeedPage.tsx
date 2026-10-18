@@ -1,18 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useInView } from 'react-intersection-observer'
-import { getFeed } from '../api/users.js'
-import PageTransition from '../components/PageTransition';
-import MoviePoster from '../components/MoviePoster';
-import ReviewCardSkeleton from '../components/ReviewCardSkeleton'
-import { Rss } from 'lucide-react'
+import PageTransition from '../components/PageTransition.js';
+import MoviePoster from '../components/MoviePoster.js';
+import ReviewCardSkeleton from '../components/ReviewCardSkeleton.js'
+import { Rss } from 'lucide-react';
+import { getFeed } from '../api/users';
+import { Review, ReviewUser } from '../types';
 
 export default function FeedPage() {
-    const [reviews, setReviews] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [page, setPage] = useState<number>(1);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
     const { ref, inView } = useInView();
     const navigate = useNavigate();
 
@@ -92,8 +93,8 @@ export default function FeedPage() {
                                                 <span className="text-yellow-400">★</span> {review.rating}/10
                                             </span>
                                         </div>
-                                        <p onClick={() => navigate(`/user/${review.userId?._id}`)} className="text-xs text-zinc-500 cursor-pointer hover:text-rose-400 transition">
-                                            {review.userId?.name}
+                                        <p onClick={() => navigate(`/user/${(review.userId as ReviewUser)?._id}`)} className="text-xs text-zinc-500 cursor-pointer hover:text-rose-400 transition">
+                                            {(review.userId as ReviewUser)?.name}
                                         </p>
                                         <p className="text-zinc-400 text-sm line-clamp-2">{review.text}</p>
                                         <div className="flex justify-between items-center pt-1">

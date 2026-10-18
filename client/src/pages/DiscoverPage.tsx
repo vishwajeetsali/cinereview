@@ -5,25 +5,29 @@ import api from '../api/axios'
 import MovieCardSkeleton from "../components/MovieCardSkeleton";
 import PageTransition from '../components/PageTransition';
 import MovieCard from '../components/MovieCard';
-const categoryMap = {
+import { Movie } from '../types';
+
+const categoryMap: Record<string, { title: string; endpoint: string }> = {
     'popular': { title: 'Popular Movies', endpoint: '/api/movies/popular' },
     'now-playing': { title: 'Now Playing', endpoint: '/api/movies/now-playing' },
     'trending': { title: 'Trending This Week', endpoint: '/api/movies/trending' },
-}
+};
 
 
 export default function DiscoverPage() {
-    const { category } = useParams()
+    const { category } = useParams<{ category: string }>();
+    const currentCategory = category ? categoryMap[category] : undefined;
     const navigate = useNavigate()
     const { ref, inView } = useInView()
 
-    const [movies, setMovies] = useState([])
-    const [loading, setLoading] = useState(true)
-    const [page, setPage] = useState(1)
-    const [hasMore, setHasMore] = useState(true)
-    const [loadingMore, setLoadingMore] = useState(false)
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [page, setPage] = useState<number>(1);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
-    const { title, endpoint } = categoryMap[category] || {}
+    const title = currentCategory?.title;
+    const endpoint = currentCategory?.endpoint;
 
     useEffect(() => {
         if (title) document.title = `${title} — CineReview`

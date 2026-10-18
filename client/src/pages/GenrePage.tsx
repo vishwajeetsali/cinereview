@@ -5,6 +5,8 @@ import api from '../api/axios';
 import MovieCardSkeleton from "../components/MovieCardSkeleton";
 import PageTransition from '../components/PageTransition'
 import MovieCard from '../components/MovieCard';
+import { Movie } from '../types';
+
 
 const SORT_OPTIONS = [
     { value: 'popularity.desc', label: 'Most Popular' },
@@ -14,19 +16,18 @@ const SORT_OPTIONS = [
 ];
 
 export default function GenrePage() {
-    const { genreId } = useParams();
+    const { genreId } = useParams<{ genreId: string }>();
     const location = useLocation();
-    const genreName = location.state?.genreName || 'Genre';
+    const genreName = (location.state as { genreName?: string } | null)?.genreName || 'Genre';
     const { ref, inView } = useInView()
     const navigate = useNavigate();
-
-    const [movies, setMovies] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [sortBy, setSortBy] = useState('popularity.desc');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [movies, setMovies] = useState<Movie[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [page, setPage] = useState<number>(1);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [sortBy, setSortBy] = useState<string>('popularity.desc');
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
     useEffect(() => {
         document.title = `${genreName} Movies — CineReview`
@@ -69,9 +70,11 @@ export default function GenrePage() {
     }, [inView, hasMore, loadingMore, page, genreId, sortBy]);
 
     useEffect(() => {
-        const handleClick = (e) => {
-            if (!e.target.closest('.sort-dropdown')) setDropdownOpen(false)
-        }
+        const handleClick = (e: MouseEvent) => {
+            if (!(e.target as HTMLElement)?.closest('.sort-dropdown')) {
+                setDropdownOpen(false);
+            }
+        };
         document.addEventListener('click', handleClick)
         return () => document.removeEventListener('click', handleClick)
     }, [])

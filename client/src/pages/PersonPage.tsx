@@ -4,13 +4,33 @@ import api from '../api/axios'
 import PageTransition from '../components/PageTransition'
 import MovieCard from '../components/MovieCard';
 
+interface Person {
+    id: number;
+    name: string;
+    profile_path?: string;
+    known_for_department?: string;
+    birthday?: string;
+    biography?: string;
+}
+
+interface PersonCredit {
+    id: number;
+    title?: string;
+    name?: string;
+    poster_path?: string;
+    job?: string;
+    release_date?: string;
+    first_air_date?: string;
+    [key: string]: any;
+}
+
 export default function PersonPage() {
-    const { personId } = useParams()
-    const navigate = useNavigate()
-    const [person, setPerson] = useState(null)
-    const [crewCredits, setCrewCredits] = useState([])
-    const [credits, setCredits] = useState([])
-    const [loading, setLoading] = useState(true)
+    const { personId } = useParams<{ personId: string }>();
+    const navigate = useNavigate();
+    const [person, setPerson] = useState<Person | null>(null);
+    const [crewCredits, setCrewCredits] = useState<PersonCredit[]>([]);
+    const [credits, setCredits] = useState<PersonCredit[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (person) document.title = `${person.name} — CineReview`
@@ -41,6 +61,8 @@ export default function PersonPage() {
             <div className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-rose-500 animate-spin" />
         </div>
     )
+
+    if (!person) return null;
 
     const filmography = person?.known_for_department === 'Directing'
         ? [...new Map(crewCredits.filter(m => m.job === 'Director' && m.poster_path).map(m => [m.id, m])).values()]

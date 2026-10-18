@@ -6,15 +6,16 @@ import MovieCardSkeleton from "../components/MovieCardSkeleton";
 import PageTransition from '../components/PageTransition';
 import MovieCard from '../components/MovieCard';
 import { Search } from 'lucide-react'
+import { Movie, User } from '../types';
 
 export default function SearchPage() {
-    const [results, setResults] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [activeTab, setActiveTab] = useState('movies');
-    const [userResults, setUserResults] = useState([]);
+    const [results, setResults] = useState<Movie[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [page, setPage] = useState<number>(1);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<'movies' | 'people'>('movies');
+    const [userResults, setUserResults] = useState<User[]>([]);
 
     const { ref, inView } = useInView();
     const [searchParams] = useSearchParams();
@@ -99,7 +100,7 @@ export default function SearchPage() {
 
                     {/* Tabs */}
                     <div className="flex gap-2 mb-6">
-                        {['movies', 'people'].map(tab => (
+                        {(['movies', 'people'] as const).map(tab => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
