@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy manifests with non-root ownership
 COPY --chown=node:node package*.json ./
 
-RUN npm ci
+RUN npm ci || npm install --legacy-peer-deps
 
 # Copy source code with non-root ownership
 COPY --chown=node:node . .
