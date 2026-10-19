@@ -2,11 +2,12 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import User from "../models/User.js"
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.GOOGLE_CALLBACK_URL
-}, async (accessToken, refreshToken, profile, done) => {
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+    passport.use(new GoogleStrategy({
+        clientID: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        callbackURL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback'
+    }, async (accessToken, refreshToken, profile, done) => {
     try {
         const email = profile.emails?.[0]?.value;
         const avatar = profile.photos?.[0]?.value;
@@ -34,5 +35,8 @@ passport.use(new GoogleStrategy({
         done(error as any, false);
     }
 }));
+} else {
+    console.warn('Warning: Google OAuth credentials missing. Google login strategy skipped.');
+}
 
 export default passport;

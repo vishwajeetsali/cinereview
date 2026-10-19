@@ -27,6 +27,11 @@ jobs:
           npm ci
 
       - name: Run Backend Security Tests
+        env:
+          NODE_ENV: test
+          JWT_ACCESS_SECRET: ci_test_secret_32_characters_long_key_access
+          JWT_REFRESH_SECRET: ci_test_secret_32_characters_long_key_refresh
+          CLIENT_URL: http://localhost:3000
         run: |
           cd server
           npx vitest run tests/security.test.ts
